@@ -24,6 +24,7 @@
 #include "prx/libwebrtc/include/AudioStateConfig.hpp"
 #include "prx/libwebrtc/include/EchoCanceller3Config.hpp"
 #include "prx/libwebrtc/include/CryptoOptions.hpp"
+#include "prx/libwebrtc/include/ColorSpace.hpp"
 #include <cstddef>
 #include <cstdint>
 #include "prx/libwebrtc/include/VideoFrameDimensions.hpp"
@@ -122,8 +123,8 @@ int APS5_VABI _ZN3rtc15CurrentThreadIdEv_nid_postfix(void);
 void APS5_VABI _ZN6webrtc13TaskQueueBase22CurrentTaskQueueSetterC1EPS0__nid_postfix(WebRtcCurrentTaskQueueSetter* setter, WebRtcTaskQueueBase* taskQueue);
 void APS5_VABI _ZN6webrtc13TaskQueueBase22CurrentTaskQueueSetterD1Ev_nid_postfix(WebRtcCurrentTaskQueueSetter* setter);
 int APS5_VABI _ZN6webrtc18EncodedImageBuffer6CreateEPKhm_nid_postfix(void);
-int APS5_VABI _ZN6webrtc10ColorSpaceC1ERKS0__nid_postfix(void);
-int APS5_VABI _ZN6webrtc10ColorSpaceaSERKS0__nid_postfix(void);
+void APS5_VABI _ZN6webrtc10ColorSpaceC1ERKS0__nid_postfix(WebRtcColorSpace* colorSpace, const WebRtcColorSpace* other);
+WebRtcColorSpace* APS5_VABI _ZN6webrtc10ColorSpaceaSERKS0__nid_postfix(WebRtcColorSpace* colorSpace, const WebRtcColorSpace* other);
 int APS5_VABI _ZN6webrtc12EncodedImageC1Ev_nid_postfix(void);
 int APS5_VABI _ZN6webrtc12EncodedImageD1Ev_nid_postfix(void);
 int APS5_VABI _ZN6webrtc10I420Buffer6CreateEiiiii_nid_postfix(void);
