@@ -9,6 +9,7 @@
 #include "prx/libc/include/General.hpp"
 #include "prx/libSceHttp/src/HttpErrors.hpp"
 #include "prx/libSceHttp/src/Options.hpp"
+#include <cerrno>
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
@@ -190,10 +191,17 @@ int APS5_VABI sceHttpCreateEpoll(int http_ctx_id, HttpEpollHandle* eh) {
     if (g_contexts.empty()) return ERROR_BEFORE_INIT;
     if (!g_contexts.contains(http_ctx_id)) return ERROR_INVALID_ID;
     if (!eh) return ERROR_INVALID_VALUE;
+    HttpEpollHandle probe{};
+    const int savedErrno = errno;
+    if (!GuestCopyIn_nid_no_patch(&probe, eh, sizeof(probe)) || !GuestCopyOut_nid_no_patch(eh, &probe, sizeof(probe))) {
+        errno = savedErrno;
+        return ERROR_INVALID_VALUE;
+    }
     auto epoll = std::make_shared<HttpEpoll>();
     const auto handle = epoll.get();
     g_epolls.emplace(handle, std::move(epoll));
-    *eh = handle;
+    GuestCopyOut_nid_no_patch(eh, &handle, sizeof(handle));
+    errno = savedErrno;
     return 0;
 }
 
