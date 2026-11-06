@@ -1592,11 +1592,35 @@ static void TestInspector() {
     bool threw = false;
     try {
         WKInspectorIsAttached(nullptr);
+static void TestFormSubmissionListener() {
+    Require(WKFormSubmissionListenerGetTypeID() == 54);
+    auto listener = NKWebKit::Make<NKWebKit::FormSubmissionListener>();
+    int callCount = 0;
+    listener->completionHandler = [&callCount]() {
+        callCount++;
+    };
+    const void* ref = listener.Get();
+    Require(!listener->continued);
+    Require(callCount == 0);
+
+    WKFormSubmissionListenerContinue(ref);
+    Require(listener->continued);
+    Require(callCount == 1);
+
+    WKFormSubmissionListenerContinue(ref);
+    Require(callCount == 1);
+
+    bool threw = false;
+    try {
+        WKFormSubmissionListenerContinue(nullptr);
     } catch (const std::invalid_argument&) {
         threw = true;
     }
     Require(threw);
 }
+=======
+
+>>>>>>> 61962330a3 (feat(libSceNKWebKit): implement WKFormSubmissionListenerContinue)
 int main() {
     TestTypeIDs();
     TestRetainRelease();
@@ -1624,7 +1648,9 @@ int main() {
     TestCertificateInfo();
 TestEmptyFrameLoaderClient();
 
+<<<<<<< HEAD
 TestInspector();
+TestFormSubmissionListener();
     std::printf("All libSceNKWebKit Base tests passed!\n");
     return 0;
 }
