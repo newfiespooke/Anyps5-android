@@ -1,4 +1,6 @@
 #include "prx/libkernel_sys/include/Api.hpp"
+#include "prx/libkernel_sys/include/AdditionalExports.hpp"
+#include "prx/libkernel/KernelErrors.hpp"
 #include "prx/libc/include/Api.hpp"
 #include "SceTypes.hpp"
 #include <array>
@@ -58,4 +60,15 @@ int main() {
     const auto gregorianTicks = unixTicks + 0x01B21DD213814000ULL;
     const auto stamp = Timestamp(first[0]);
     Require(stamp + 600000000ULL > gregorianTicks && stamp < gregorianTicks + 600000000ULL);
+
+    Require(sceKernelCreateUuidV1(nullptr) == SCE_KERNEL_ERROR_EINVAL);
+    Require(sceKernelCreateUuidV1(reinterpret_cast<std::uint8_t*>(0x10)) == SCE_KERNEL_ERROR_EFAULT);
+    std::array<std::uint8_t, 16> kernelUuidBytes{};
+    Require(sceKernelCreateUuidV1(kernelUuidBytes.data()) == 0);
+    GuestUuid kernelUuid{};
+    std::memcpy(&kernelUuid, kernelUuidBytes.data(), sizeof(kernelUuid));
+    Require((kernelUuid.timeHiAndVersion >> 12) == 1);
+    Require((kernelUuid.clockSeqHiAndReserved & 0xc0) == 0x80);
+    Require((kernelUuid.node[0] & 0x01) != 0);
+    Require(std::memcmp(kernelUuid.node, first[0].node, sizeof(kernelUuid.node)) == 0);
 }
