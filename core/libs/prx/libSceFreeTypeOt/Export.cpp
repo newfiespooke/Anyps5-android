@@ -548,7 +548,7 @@ std::uint32_t APS5_VABI ft_highpow2_nid_postfix(std::uint32_t value) {
     return std::bit_floor(value);
 }
 
-void APS5_VABI FreetypeSynthesizeVerticalMetrics(FreeType::GuestGlyphMetrics* metrics, std::int64_t advance) {
+void APS5_VABI ft_synthesize_vertical_metrics_nid_postfix(FreeType::GuestGlyphMetrics* metrics, std::int64_t advance) {
     if (!metrics) {
         return;
     }
@@ -567,9 +567,8 @@ void APS5_VABI FreetypeSynthesizeVerticalMetrics(FreeType::GuestGlyphMetrics* me
     metrics->vertBearingY = (advance - height) / 2;
     metrics->vertAdvance = advance;
 }
-APS5_EXPORT("y4Dg0njlwIU", FreetypeSynthesizeVerticalMetrics);
 
-void* APS5_VABI FreetypeServiceListLookup(const GuestServiceDesc* descriptors, const char* service_id) {
+void* APS5_VABI ft_service_list_lookup_nid_postfix(const GuestServiceDesc* descriptors, const char* service_id) {
     if (descriptors && service_id) {
         for (; descriptors->serv_id; ++descriptors) {
             if (std::strcmp(descriptors->serv_id, service_id) == 0) {
@@ -579,7 +578,6 @@ void* APS5_VABI FreetypeServiceListLookup(const GuestServiceDesc* descriptors, c
     }
     return nullptr;
 }
-APS5_EXPORT("00MQVzW2OPY", FreetypeServiceListLookup);
 
 int APS5_VABI sceFreeTypeOtUnknown_Ln9I6YfmYJU_nid_no_patch() {
     NotImplemented_nid_no_patch(__func__);

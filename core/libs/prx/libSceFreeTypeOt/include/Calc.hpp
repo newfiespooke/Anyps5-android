@@ -18,7 +18,7 @@ void APS5_VABI FT_Vector_Transform_Scaled_nid_postfix(FreeType::GuestVector* vec
 std::int32_t APS5_VABI FT_SqrtFixed_nid_postfix(std::int32_t x);
 std::int32_t APS5_VABI FT_Sqrt32_nid_postfix(std::int32_t x);
 std::uint32_t APS5_VABI ft_highpow2_nid_postfix(std::uint32_t value);
-void APS5_VABI FreetypeSynthesizeVerticalMetrics(FreeType::GuestGlyphMetrics* metrics, std::int64_t advance);
-void* APS5_VABI FreetypeServiceListLookup(const GuestServiceDesc* descriptors, const char* service_id);
+void APS5_VABI ft_synthesize_vertical_metrics_nid_postfix(FreeType::GuestGlyphMetrics* metrics, std::int64_t advance);
+void* APS5_VABI ft_service_list_lookup_nid_postfix(const GuestServiceDesc* descriptors, const char* service_id);
 
 }
