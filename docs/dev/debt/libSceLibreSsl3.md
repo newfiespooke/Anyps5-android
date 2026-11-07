@@ -52,6 +52,7 @@
 - [X509_getm_notBefore, X509_getm_notAfter, X509_get0_notBefore, X509_get0_notAfter, X509_get0_signature](../../../core/libs/prx/libSceLibreSsl3/src/X509Validity.cpp) (libSceLibreSsl3) - nothing is checked on the console. The `X509`, `X509_CINF` and `X509_VAL` layouts and the results follow [LibreSSL 4.0.0](https://github.com/libressl/openbsd/tree/ce488b78e0bd994780569df718596b9776ff681a/src/lib/libcrypto) `x509_local.h`, `x509_set.c` and `x_x509.c`, the version in the [firmware 13.40 measurements](https://github.com/boykopovar/AnyPS5/discussions/8981#discussioncomment-19111214). No export of this module creates a certificate yet, so only certificates the caller builds reach them. A null certificate in `X509_get0_signature` throws when an output is requested, where LibreSSL dereferences it; with both outputs null the call returns without reading the certificate, as in LibreSSL
 
 - [ASN1_TIME_diff](../../../core/libs/prx/libSceLibreSsl3/src/Time.cpp) has no console ABI or behavior verification. Its signature and date rules follow LibreSSL 4.0.0 [a_time.c](https://github.com/libressl/openbsd/blob/ce488b78e0bd994780569df718596b9776ff681a/src/lib/libcrypto/asn1/a_time.c), [a_time_tm.c](https://github.com/libressl/openbsd/blob/ce488b78e0bd994780569df718596b9776ff681a/src/lib/libcrypto/asn1/a_time_tm.c) and [a_time_posix.c](https://github.com/libressl/openbsd/blob/ce488b78e0bd994780569df718596b9776ff681a/src/lib/libcrypto/asn1/a_time_posix.c), using the existing 24-byte string layout. Null inputs use the host wall clock; the console clock relationship is unverified. Null output pointers throw after valid input parsing, where the reference dereferences them. Closes when: measured on a PS5.
+- [ASN1_TIME_new and X509_gmtime_adj](../../../core/libs/prx/libSceLibreSsl3/src/TimeNew.cpp) (libSceLibreSsl3) - nothing is checked on the console. As in [LibreSSL 4.0.0](https://github.com/libressl/openbsd/blob/ce488b78e0bd994780569df718596b9776ff681a/src/lib/libcrypto/asn1/a_time_tm.c) `a_time_tm.c` and `tasn_new.c`, `ASN1_TIME_new` returns a zeroed 24-byte string from the guest heap with type -1 and the multi-string flag, queueing two ASN1 malloc failures when the allocation fails, and `X509_gmtime_adj` writes the host wall clock plus the offset as UTCTime for 1950 to 2049 and GeneralizedTime otherwise, reusing the given string or a new one, and returns null without an error outside years 0 to 9999. The console clock and the heap the guest frees these with are unverified. Closes when: compared with the console.
 
 - [SSL_SESSION_get_timeout, SSL_SESSION_set_time and SSL_SESSION_get_protocol_version](../../../core/libs/prx/libSceLibreSsl3/src/SessionMetadata.cpp) - forwarded session lifecycle interoperability, independent console execution, resumption, serialization and expiry remain unverified. The fields follow [LibreSSL 4.0.0](https://github.com/libressl/openbsd/tree/ce488b78e0bd994780569df718596b9776ff681a/src/lib/libssl). [LibreSSL 2.5.4](https://github.com/libressl/openbsd/blob/2e2c612066aa993717528a0249c15c51128d61cb/src/lib/libssl/ssl.h) instead puts timeout/time at 144/152; these accessors must not receive that older layout. Tests use caller-owned storage. A null protocol-version input throws instead of dereferencing it.
 - [Session metadata fields](../../../core/libs/prx/libSceLibreSsl3/src/SessionMetadata.cpp) - other firmware revisions are unverified. [BunnyFl reports disassembly only](https://github.com/boykopovar/AnyPS5/pull/15119#pullrequestreview-5742135511) of firmware 13.42 `system/common/lib/libSceLibreSsl3.sprx` (SHA256 `ee2c529c87fe21b7ef1e5f13d10c47ee90944f52a1f848fe0995e031817c2c3a`): getter `0xf2130` reads 64-bit timeout at 168 with null returning zero; setter `0xf2150` writes 64-bit creation time at 176 and returns it, with null returning zero; getter `0xf2170` reads 32-bit version at 0 without a null check. The module and listing have not been independently acquired or executed here.
@@ -66,6 +67,7 @@
 ### Additional callable export inventory
 
 - [Additional exports](../../../core/libs/prx/libSceLibreSsl3/AdditionalExports.cpp) declare 140 still-unimplemented callable exports: 130 named and 10 known only by NID. These entries throw. Parameterless `int` declarations are unknown-signature placeholders, not verified ABI contracts. Names/NIDs match the 13.60 export table. The fourteen libtls lifecycle/config exports are implemented in `LibTls.cpp`; title compatibility beyond preconnection behavior remains unverified.
+- [Additional exports](../../../core/libs/prx/libSceLibreSsl3/AdditionalExports.cpp) declare 173 remaining callable exports: 163 155 named and 10 known only by NID. Every entry throws. Parameterless `int` declarations are unknown-signature placeholders, not verified ABI contracts. Names/NIDs match the 13.60 export table. No functional implementation or title unblock is claimed.
 
 | Name | NID |
 | --- | --- |
@@ -142,7 +144,6 @@
 | `BIO_get_data` | `U3AsZ-9e2MI` |
 | `SSL_CTX_set0_chain` | `UHkYqkyfwOs` |
 | `EVP_PKEY2PKCS8` | `UT6E1YgI8mw` |
-| `ASN1_TIME_new` | `UmAPG5bxYYk` |
 | `X509_STORE_load_locations` | `V3JtebYui1A` |
 | `ERR_func_error_string` | `VXuysR7ySzw` |
 | `X509_set_issuer_name` | `XK3FmaTS6pg` |
@@ -150,7 +151,6 @@
 | `X509_add_ext` | `YJ7bfxMHniE` |
 | `tls_connect_socket` | `ZERQN8ewpgk` |
 | `SSL_CTX_set_quic_method` | `ZFeTGo4ybcw` |
-| `X509_gmtime_adj` | `ZQ3b6SakHkc` |
 | `SSL_process_quic_post_handshake` | `aKGUCnoiE+k` |
 | `unknown` | `aLdgrI2jAF0` |
 | `EC_POINT_clear_free` | `aSO3Svp7umY` |
