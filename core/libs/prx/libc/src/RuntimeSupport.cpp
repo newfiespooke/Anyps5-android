@@ -1,3 +1,4 @@
+#include "prx/libc/include/Api.hpp"
 #include <algorithm>
 #include <cstdio>
 #include <cstdint>
@@ -59,6 +60,11 @@ FileStream _Stdin_nid_postfix{stdin};
 
 std::FILE* GuestStandardOutputFile_nid_no_patch() {
     return GetNativeStream(&_Stdout_nid_postfix);
+}
+
+std::FILE* GuestStandardOutputForWriting_nid_no_patch() {
+    auto* native = GetNativeStream(&_Stdout_nid_postfix);
+    return _Stdout_nid_postfix.SwitchToWriting() ? native : nullptr;
 }
 
 int APS5_VABI __cxa_atexit_nid_postfix(void (APS5_VABI *func)(void*), void* arg, void* dsoHandle) {
@@ -141,8 +147,33 @@ unsigned int APS5_VABI _ZSt14_Random_devicev_nid_postfix() {
     return value;
 }
 
-[[noreturn]] void APS5_VABI _ZSt14_Throw_C_errori_nid_postfix(int code) {
-    throw std::runtime_error("_Throw_C_error: C11 thread error " + std::to_string(code));
+static constexpr int ThrdNomem = 1;
+static constexpr int ThrdTimedout = 2;
+static constexpr int ThrdBusy = 3;
+static constexpr int ThrdError = 4;
+static constexpr int ThrdPermission = 5;
+
+static constexpr int CppDeviceOrResourceBusy = 0;
+static constexpr int CppInvalidArgument = 1;
+static constexpr int CppOperationNotPermitted = 4;
+static constexpr int CppResourceUnavailableTryAgain = 6;
+
+[[noreturn]] void ThrowCppError_nid_no_patch(int code);
+
+void APS5_VABI _ZSt14_Throw_C_errori_nid_postfix(int code) {
+    switch (code) {
+    case ThrdNomem:
+    case ThrdTimedout:
+        ThrowCppError_nid_no_patch(CppResourceUnavailableTryAgain);
+    case ThrdBusy:
+        ThrowCppError_nid_no_patch(CppDeviceOrResourceBusy);
+    case ThrdError:
+        ThrowCppError_nid_no_patch(CppInvalidArgument);
+    case ThrdPermission:
+        ThrowCppError_nid_no_patch(CppOperationNotPermitted);
+    default:
+        return;
+    }
 }
 
 void APS5_VABI _Lockfilelock_nid_postfix(FileStream* stream) {
@@ -165,10 +196,12 @@ void APS5_VABI _Unlockfilelock_nid_postfix(FileStream* stream) {
 
 void APS5_VABI flockfile_nid_postfix(FileStream* stream) {
     _Lockfilelock_nid_postfix(stream);
+
 }
 
 void APS5_VABI funlockfile_nid_postfix(FileStream* stream) {
     _Unlockfilelock_nid_postfix(stream);
+
 }
 
 int APS5_VABI ftrylockfile_nid_postfix(FileStream* stream) {
