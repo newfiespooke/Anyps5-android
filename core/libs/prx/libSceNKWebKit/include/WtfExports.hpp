@@ -9,16 +9,7 @@
 #include <cstddef>
 #include <cstdint>
 
-namespace NKWebKit {
-
-enum class ContentTypeMode : std::int32_t { Rfc2045, MimeSniff };
-static_assert(sizeof(ContentTypeMode) == 4);
-
-}  // namespace NKWebKit
-
 extern "C" {
-
-bool APS5_VABI _ZN7WebCore18isValidContentTypeERKN3WTF6StringENS_4ModeE(const NKWebKit::WtfAbi::String& input, NKWebKit::ContentTypeMode mode);
 
 [[noreturn]] void APS5_VABI WTFCrash();
 [[noreturn]] void APS5_VABI WTFCrashWithSecurityImplication();
