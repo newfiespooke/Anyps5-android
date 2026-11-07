@@ -254,4 +254,19 @@ public:
     bool isVisible = false;
 };
 
+
+struct WKGeolocationProviderBase {
+    int version;
+    const void* clientInfo;
+};
+
+class GeolocationManager final : public ObjectOf<ObjectType::GeolocationManager> {
+public:
+    WKGeolocationProviderBase provider{0, nullptr};
+    bool hasProvider = false;
+    Retained<Object> lastPosition;
+    bool hasError = false;
+    std::u16string lastErrorMessage;
+};
+
 }  // namespace NKWebKit

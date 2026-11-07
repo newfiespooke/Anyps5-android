@@ -246,4 +246,9 @@ std::uint32_t APS5_VABI WKWebsiteDataStoreGetTypeID();
 std::uint32_t APS5_VABI WKWebsitePoliciesGetTypeID();
 std::uint32_t APS5_VABI WKWindowFeaturesGetTypeID();
 
+struct WKGeolocationProviderBase;
+void APS5_VABI WKGeolocationManagerSetProvider(const void* managerRef, const WKGeolocationProviderBase* provider);
+void APS5_VABI WKGeolocationManagerProviderDidChangePosition(const void* managerRef, const void* positionRef);
+void APS5_VABI WKGeolocationManagerProviderDidFailToDeterminePosition(const void* managerRef);
+void APS5_VABI WKGeolocationManagerProviderDidFailToDeterminePositionWithErrorMessage(const void* managerRef, const void* errorMessageRef);
 }
