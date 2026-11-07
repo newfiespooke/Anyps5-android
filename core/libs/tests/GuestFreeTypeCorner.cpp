@@ -50,12 +50,12 @@ FreeType::GuestVector Transformed(FreeType::GuestVector vector, const FreeType::
 }
 
 FreeType::GuestMatrix PlainMultiplied(const FreeType::GuestMatrix& a, FreeType::GuestMatrix b) {
-    FreetypeMatrixMultiply(&a, &b);
+    FT_Matrix_Multiply_nid_postfix(&a, &b);
     return b;
 }
 
 FreeType::GuestVector PlainTransformed(FreeType::GuestVector vector, const FreeType::GuestMatrix& matrix) {
-    FreetypeVectorTransform(&vector, &matrix);
+    FT_Vector_Transform_nid_postfix(&vector, &matrix);
     return vector;
 }
 
@@ -177,71 +177,71 @@ void CheckHighPow2() {
 }
 
 void CheckMulDiv() {
-    Require(FreetypeMulDiv(7, 3, 2) == 11, "FT_MulDiv rounds half away from zero");
-    Require(FreetypeMulDiv(-7, 3, 2) == -11, "FT_MulDiv rounds a negative quotient away from zero");
-    Require(FreetypeMulDiv(7, -3, -2) == 11, "FT_MulDiv multiplies the operand signs");
-    Require(FreetypeMulDiv(7, 3, -2) == -11, "FT_MulDiv takes the divisor sign");
-    Require(FreetypeMulDiv(0, 3, 5) == 0, "FT_MulDiv of a zero factor is 0");
-    Require(FreetypeMulDiv(5, 7, 7) == 5, "FT_MulDiv with b equal to c returns a");
-    Require(FreetypeMulDiv(5, 3, 0) == 0x7FFFFFFF, "FT_MulDiv saturates a zero divisor");
-    Require(FreetypeMulDiv(-5, 3, 0) == -0x7FFFFFFF, "FT_MulDiv keeps the factor sign for a zero divisor");
-    Require(FreetypeMulDiv(7, 3, 2) == FT_MulDiv_No_Round_nid_postfix(7, 3, 2) + 1, "FT_MulDiv rounds where FT_MulDiv_No_Round truncates");
-    Require(FreetypeMulDiv(6, 3, 2) == FT_MulDiv_No_Round_nid_postfix(6, 3, 2), "FT_MulDiv matches FT_MulDiv_No_Round on an exact quotient");
+    Require(FT_MulDiv_nid_postfix(7, 3, 2) == 11, "FT_MulDiv rounds half away from zero");
+    Require(FT_MulDiv_nid_postfix(-7, 3, 2) == -11, "FT_MulDiv rounds a negative quotient away from zero");
+    Require(FT_MulDiv_nid_postfix(7, -3, -2) == 11, "FT_MulDiv multiplies the operand signs");
+    Require(FT_MulDiv_nid_postfix(7, 3, -2) == -11, "FT_MulDiv takes the divisor sign");
+    Require(FT_MulDiv_nid_postfix(0, 3, 5) == 0, "FT_MulDiv of a zero factor is 0");
+    Require(FT_MulDiv_nid_postfix(5, 7, 7) == 5, "FT_MulDiv with b equal to c returns a");
+    Require(FT_MulDiv_nid_postfix(5, 3, 0) == 0x7FFFFFFF, "FT_MulDiv saturates a zero divisor");
+    Require(FT_MulDiv_nid_postfix(-5, 3, 0) == -0x7FFFFFFF, "FT_MulDiv keeps the factor sign for a zero divisor");
+    Require(FT_MulDiv_nid_postfix(7, 3, 2) == FT_MulDiv_No_Round_nid_postfix(7, 3, 2) + 1, "FT_MulDiv rounds where FT_MulDiv_No_Round truncates");
+    Require(FT_MulDiv_nid_postfix(6, 3, 2) == FT_MulDiv_No_Round_nid_postfix(6, 3, 2), "FT_MulDiv matches FT_MulDiv_No_Round on an exact quotient");
 }
 
 void CheckMulFix() {
-    Require(FreetypeMulFix(0x10000, 0x10000) == 0x10000, "FT_MulFix of one times one is one");
-    Require(FreetypeMulFix(-0x10000, 0x10000) == -0x10000, "FT_MulFix keeps the factor sign");
-    Require(FreetypeMulFix(0x10000, -0x10000) == -0x10000, "FT_MulFix keeps the multiplier sign");
-    Require(FreetypeMulFix(-0x10000, -0x10000) == 0x10000, "FT_MulFix multiplies two negative factors");
-    Require(FreetypeMulFix(0x18000, 0x10000) == 0x18000, "FT_MulFix by one keeps the value");
-    Require(FreetypeMulFix(0x10000, 1) == 1, "FT_MulFix of the smallest positive unit is exact");
-    Require(FreetypeMulFix(3, 3) == 0, "FT_MulFix truncates a sub-unit product to zero");
-    Require(FreetypeMulFix(0x8000, 0x10000) == 0x8000, "FT_MulFix keeps one half");
-    Require(FreetypeMulFix(0x7FFF, 0x10000) == 0x7FFF, "FT_MulFix keeps just below one half");
+    Require(FT_MulFix_nid_postfix(0x10000, 0x10000) == 0x10000, "FT_MulFix of one times one is one");
+    Require(FT_MulFix_nid_postfix(-0x10000, 0x10000) == -0x10000, "FT_MulFix keeps the factor sign");
+    Require(FT_MulFix_nid_postfix(0x10000, -0x10000) == -0x10000, "FT_MulFix keeps the multiplier sign");
+    Require(FT_MulFix_nid_postfix(-0x10000, -0x10000) == 0x10000, "FT_MulFix multiplies two negative factors");
+    Require(FT_MulFix_nid_postfix(0x18000, 0x10000) == 0x18000, "FT_MulFix by one keeps the value");
+    Require(FT_MulFix_nid_postfix(0x10000, 1) == 1, "FT_MulFix of the smallest positive unit is exact");
+    Require(FT_MulFix_nid_postfix(3, 3) == 0, "FT_MulFix truncates a sub-unit product to zero");
+    Require(FT_MulFix_nid_postfix(0x8000, 0x10000) == 0x8000, "FT_MulFix keeps one half");
+    Require(FT_MulFix_nid_postfix(0x7FFF, 0x10000) == 0x7FFF, "FT_MulFix keeps just below one half");
 }
 
 void CheckDivFix() {
-    Require(FreetypeDivFix(0x10000, 0x10000) == 0x10000, "FT_DivFix of one by one is one");
-    Require(FreetypeDivFix(-0x10000, 0x10000) == -0x10000, "FT_DivFix keeps the dividend sign");
-    Require(FreetypeDivFix(0x10000, -0x10000) == -0x10000, "FT_DivFix takes the divisor sign");
-    Require(FreetypeDivFix(-0x10000, -0x10000) == 0x10000, "FT_DivFix divides two negative operands");
-    Require(FreetypeDivFix(0x18000, 0x10000) == 0x18000, "FT_DivFix by one keeps the value");
-    Require(FreetypeDivFix(0x10000, 0x20000) == 0x8000, "FT_DivFix of one by two is one half");
-    Require(FreetypeDivFix(0x10000, 2) == 0x80000000, "FT_DivFix scales by 0x10000 over the divisor");
-    Require(FreetypeDivFix(1, 2) == 0x8000, "FT_DivFix of one half unit is exact");
+    Require(FT_DivFix_nid_postfix(0x10000, 0x10000) == 0x10000, "FT_DivFix of one by one is one");
+    Require(FT_DivFix_nid_postfix(-0x10000, 0x10000) == -0x10000, "FT_DivFix keeps the dividend sign");
+    Require(FT_DivFix_nid_postfix(0x10000, -0x10000) == -0x10000, "FT_DivFix takes the divisor sign");
+    Require(FT_DivFix_nid_postfix(-0x10000, -0x10000) == 0x10000, "FT_DivFix divides two negative operands");
+    Require(FT_DivFix_nid_postfix(0x18000, 0x10000) == 0x18000, "FT_DivFix by one keeps the value");
+    Require(FT_DivFix_nid_postfix(0x10000, 0x20000) == 0x8000, "FT_DivFix of one by two is one half");
+    Require(FT_DivFix_nid_postfix(0x10000, 2) == 0x80000000, "FT_DivFix scales by 0x10000 over the divisor");
+    Require(FT_DivFix_nid_postfix(1, 2) == 0x8000, "FT_DivFix of one half unit is exact");
 }
 
 void CheckRoundFix() {
-    Require(FreetypeRoundFix(0x18000) == 0x20000, "FT_RoundFix rounds one and a half up");
-    Require(FreetypeRoundFix(-0x18000) == -0x20000, "FT_RoundFix rounds negative one and a half away from zero");
-    Require(FreetypeRoundFix(0x17FFF) == 0x10000, "FT_RoundFix rounds just below one and a half down");
-    Require(FreetypeRoundFix(-0x17FFF) == -0x10000, "FT_RoundFix rounds negative just below one and a half toward zero");
-    Require(FreetypeRoundFix(0x20000) == 0x20000, "FT_RoundFix keeps an exact integer");
-    Require(FreetypeRoundFix(-0x20000) == -0x20000, "FT_RoundFix keeps a negative exact integer");
-    Require(FreetypeRoundFix(0) == 0, "FT_RoundFix of zero is zero");
-    Require(FreetypeRoundFix(1) == 0, "FT_RoundFix of the smallest unit is zero");
-    Require(FreetypeRoundFix(-1) == 0, "FT_RoundFix of the smallest negative unit is zero");
+    Require(FT_RoundFix_nid_postfix(0x18000) == 0x20000, "FT_RoundFix rounds one and a half up");
+    Require(FT_RoundFix_nid_postfix(-0x18000) == -0x20000, "FT_RoundFix rounds negative one and a half away from zero");
+    Require(FT_RoundFix_nid_postfix(0x17FFF) == 0x10000, "FT_RoundFix rounds just below one and a half down");
+    Require(FT_RoundFix_nid_postfix(-0x17FFF) == -0x10000, "FT_RoundFix rounds negative just below one and a half toward zero");
+    Require(FT_RoundFix_nid_postfix(0x20000) == 0x20000, "FT_RoundFix keeps an exact integer");
+    Require(FT_RoundFix_nid_postfix(-0x20000) == -0x20000, "FT_RoundFix keeps a negative exact integer");
+    Require(FT_RoundFix_nid_postfix(0) == 0, "FT_RoundFix of zero is zero");
+    Require(FT_RoundFix_nid_postfix(1) == 0, "FT_RoundFix of the smallest unit is zero");
+    Require(FT_RoundFix_nid_postfix(-1) == 0, "FT_RoundFix of the smallest negative unit is zero");
 }
 
 void CheckCeilFix() {
-    Require(FreetypeCeilFix(0x18000) == 0x20000, "FT_CeilFix rounds one and a half up");
-    Require(FreetypeCeilFix(-0x18000) == -0x10000, "FT_CeilFix rounds negative one and a half toward zero");
-    Require(FreetypeCeilFix(0x20000) == 0x20000, "FT_CeilFix keeps an exact integer");
-    Require(FreetypeCeilFix(-0x20000) == -0x20000, "FT_CeilFix keeps a negative exact integer");
-    Require(FreetypeCeilFix(0) == 0, "FT_CeilFix of zero is zero");
-    Require(FreetypeCeilFix(1) == 0x10000, "FT_CeilFix of the smallest unit is one");
-    Require(FreetypeCeilFix(-1) == 0, "FT_CeilFix of the smallest negative unit is zero");
+    Require(FT_CeilFix_nid_postfix(0x18000) == 0x20000, "FT_CeilFix rounds one and a half up");
+    Require(FT_CeilFix_nid_postfix(-0x18000) == -0x10000, "FT_CeilFix rounds negative one and a half toward zero");
+    Require(FT_CeilFix_nid_postfix(0x20000) == 0x20000, "FT_CeilFix keeps an exact integer");
+    Require(FT_CeilFix_nid_postfix(-0x20000) == -0x20000, "FT_CeilFix keeps a negative exact integer");
+    Require(FT_CeilFix_nid_postfix(0) == 0, "FT_CeilFix of zero is zero");
+    Require(FT_CeilFix_nid_postfix(1) == 0x10000, "FT_CeilFix of the smallest unit is one");
+    Require(FT_CeilFix_nid_postfix(-1) == 0, "FT_CeilFix of the smallest negative unit is zero");
 }
 
 void CheckFloorFix() {
-    Require(FreetypeFloorFix(0x18000) == 0x10000, "FT_FloorFix truncates one and a half down");
-    Require(FreetypeFloorFix(-0x18000) == -0x20000, "FT_FloorFix rounds negative one and a half away from zero");
-    Require(FreetypeFloorFix(0x20000) == 0x20000, "FT_FloorFix keeps an exact integer");
-    Require(FreetypeFloorFix(-0x20000) == -0x20000, "FT_FloorFix keeps a negative exact integer");
-    Require(FreetypeFloorFix(0) == 0, "FT_FloorFix of zero is zero");
-    Require(FreetypeFloorFix(0xFFFF) == 0, "FT_FloorFix of just below one is zero");
-    Require(FreetypeFloorFix(-1) == -0x10000, "FT_FloorFix of the smallest negative unit is negative one");
+    Require(FT_FloorFix_nid_postfix(0x18000) == 0x10000, "FT_FloorFix truncates one and a half down");
+    Require(FT_FloorFix_nid_postfix(-0x18000) == -0x20000, "FT_FloorFix rounds negative one and a half away from zero");
+    Require(FT_FloorFix_nid_postfix(0x20000) == 0x20000, "FT_FloorFix keeps an exact integer");
+    Require(FT_FloorFix_nid_postfix(-0x20000) == -0x20000, "FT_FloorFix keeps a negative exact integer");
+    Require(FT_FloorFix_nid_postfix(0) == 0, "FT_FloorFix of zero is zero");
+    Require(FT_FloorFix_nid_postfix(0xFFFF) == 0, "FT_FloorFix of just below one is zero");
+    Require(FT_FloorFix_nid_postfix(-1) == -0x10000, "FT_FloorFix of the smallest negative unit is negative one");
 }
 
 void CheckMatrixMultiply() {
@@ -258,29 +258,29 @@ void CheckMatrixMultiply() {
         Multiplied({1 << 16, 2 << 16, 3 << 16, 4 << 16}, {5 << 16, 6 << 16, 7 << 16, 8 << 16}, 1)),
         "FT_Matrix_Multiply equals FT_Matrix_Multiply_Scaled with scaling 1 on a known pair");
     FreeType::GuestMatrix target = matrix;
-    FreetypeMatrixMultiply(nullptr, &target);
-    FreetypeMatrixMultiply(&identity, nullptr);
+    FT_Matrix_Multiply_nid_postfix(nullptr, &target);
+    FT_Matrix_Multiply_nid_postfix(&identity, nullptr);
     Require(SameMatrix(target, matrix), "FT_Matrix_Multiply ignores a null matrix");
 }
 
 void CheckMatrixInvert() {
     const FreeType::GuestMatrix identity{0x10000, 0, 0, 0x10000};
     FreeType::GuestMatrix target = identity;
-    Require(FreetypeMatrixInvert(&target) == 0, "FT_Matrix_Invert of the identity succeeds");
+    Require(FT_Matrix_Invert_nid_postfix(&target) == 0, "FT_Matrix_Invert of the identity succeeds");
     Require(SameMatrix(target, identity), "FT_Matrix_Invert of the identity keeps the identity");
     FreeType::GuestMatrix rotation{0, -0x10000, 0x10000, 0};
-    Require(FreetypeMatrixInvert(&rotation) == 0, "FT_Matrix_Invert of a rotation succeeds");
+    Require(FT_Matrix_Invert_nid_postfix(&rotation) == 0, "FT_Matrix_Invert of a rotation succeeds");
     Require(SameMatrix(rotation, {0, 0x10000, -0x10000, 0}), "FT_Matrix_Invert of a rotation is the opposite rotation");
     FreeType::GuestMatrix half{0x8000, 0, 0, 0x8000};
-    Require(FreetypeMatrixInvert(&half) == 0, "FT_Matrix_Invert of a half scaling succeeds");
+    Require(FT_Matrix_Invert_nid_postfix(&half) == 0, "FT_Matrix_Invert of a half scaling succeeds");
     Require(SameMatrix(half, {0x20000, 0, 0, 0x20000}), "FT_Matrix_Invert of a half scaling doubles");
     FreeType::GuestMatrix singular{0x10000, 0x20000, 0x10000, 0x20000};
-    Require(FreetypeMatrixInvert(&singular) == 6, "FT_Matrix_Invert of a singular matrix fails");
+    Require(FT_Matrix_Invert_nid_postfix(&singular) == 6, "FT_Matrix_Invert of a singular matrix fails");
     Require(SameMatrix(singular, {0x10000, 0x20000, 0x10000, 0x20000}), "FT_Matrix_Invert leaves a singular matrix unchanged");
     FreeType::GuestMatrix zero{0, 0, 0, 0};
-    Require(FreetypeMatrixInvert(&zero) == 6, "FT_Matrix_Invert of a zero matrix fails");
+    Require(FT_Matrix_Invert_nid_postfix(&zero) == 6, "FT_Matrix_Invert of a zero matrix fails");
     Require(SameMatrix(zero, {0, 0, 0, 0}), "FT_Matrix_Invert leaves a zero matrix unchanged");
-    Require(FreetypeMatrixInvert(nullptr) == 6, "FT_Matrix_Invert of a null matrix fails");
+    Require(FT_Matrix_Invert_nid_postfix(nullptr) == 6, "FT_Matrix_Invert of a null matrix fails");
 }
 
 void CheckVectorTransform() {
@@ -295,8 +295,8 @@ void CheckVectorTransform() {
         Transformed({100, -200}, {0x18000, 0x8000, -0x10000, 0x20000}, 1)),
         "FT_Vector_Transform equals FT_Vector_Transform_Scaled with scaling 1 on a known pair");
     FreeType::GuestVector target = vector;
-    FreetypeVectorTransform(&target, nullptr);
-    FreetypeVectorTransform(nullptr, &identity);
+    FT_Vector_Transform_nid_postfix(&target, nullptr);
+    FT_Vector_Transform_nid_postfix(nullptr, &identity);
     Require(SameVector(target, vector), "FT_Vector_Transform ignores a null vector or matrix");
 }
 

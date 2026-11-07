@@ -547,42 +547,35 @@ std::uint32_t APS5_VABI ft_highpow2_nid_postfix(std::uint32_t value) {
     return std::bit_floor(value);
 }
 
-std::int64_t APS5_VABI FreetypeMulDiv(std::int64_t a, std::int64_t b, std::int64_t c) {
+std::int64_t APS5_VABI FT_MulDiv_nid_postfix(std::int64_t a, std::int64_t b, std::int64_t c) {
     return CheckedMulDiv(a, b, c, true, __func__);
 }
-APS5_EXPORT("Q+ysHCIzphI", FreetypeMulDiv);
 
-std::int64_t APS5_VABI FreetypeMulFix(std::int64_t a, std::int64_t b) {
+std::int64_t APS5_VABI FT_MulFix_nid_postfix(std::int64_t a, std::int64_t b) {
     return CheckedMulDiv(a, b, 0x10000, true, __func__);
 }
-APS5_EXPORT("774ZHX0Z3Cc", FreetypeMulFix);
 
-std::int64_t APS5_VABI FreetypeDivFix(std::int64_t a, std::int64_t b) {
+std::int64_t APS5_VABI FT_DivFix_nid_postfix(std::int64_t a, std::int64_t b) {
     return CheckedMulDiv(a, 0x10000, b, true, __func__);
 }
-APS5_EXPORT("fp-jO+c8Rfk", FreetypeDivFix);
 
-std::int64_t APS5_VABI FreetypeRoundFix(std::int64_t a) {
+std::int64_t APS5_VABI FT_RoundFix_nid_postfix(std::int64_t a) {
     return (a + 0x8000 - (a < 0)) & ~0xFFFF;
 }
-APS5_EXPORT("IdtpBr-PoD0", FreetypeRoundFix);
 
-std::int64_t APS5_VABI FreetypeCeilFix(std::int64_t a) {
+std::int64_t APS5_VABI FT_CeilFix_nid_postfix(std::int64_t a) {
     return (a + 0xFFFF) & ~0xFFFF;
 }
-APS5_EXPORT("92e4jZiW9Tc", FreetypeCeilFix);
 
-std::int64_t APS5_VABI FreetypeFloorFix(std::int64_t a) {
+std::int64_t APS5_VABI FT_FloorFix_nid_postfix(std::int64_t a) {
     return a & ~0xFFFF;
 }
-APS5_EXPORT("EqN+ED6P2FA", FreetypeFloorFix);
 
-void APS5_VABI FreetypeMatrixMultiply(const FreeType::GuestMatrix* a, FreeType::GuestMatrix* b) {
+void APS5_VABI FT_Matrix_Multiply_nid_postfix(const FreeType::GuestMatrix* a, FreeType::GuestMatrix* b) {
     FT_Matrix_Multiply_Scaled_nid_postfix(a, b, 1);
 }
-APS5_EXPORT("SaJj4xMf2Sc", FreetypeMatrixMultiply);
 
-int APS5_VABI FreetypeMatrixInvert(FreeType::GuestMatrix* matrix) {
+int APS5_VABI FT_Matrix_Invert_nid_postfix(FreeType::GuestMatrix* matrix) {
     constexpr int FtErrInvalidArgument = 6;
     if (!matrix) {
         return FtErrInvalidArgument;
@@ -602,12 +595,10 @@ int APS5_VABI FreetypeMatrixInvert(FreeType::GuestMatrix* matrix) {
     matrix->yy = yy;
     return 0;
 }
-APS5_EXPORT("TfB3QTQN-Ek", FreetypeMatrixInvert);
 
-void APS5_VABI FreetypeVectorTransform(FreeType::GuestVector* vector, const FreeType::GuestMatrix* matrix) {
+void APS5_VABI FT_Vector_Transform_nid_postfix(FreeType::GuestVector* vector, const FreeType::GuestMatrix* matrix) {
     FT_Vector_Transform_Scaled_nid_postfix(vector, matrix, 1);
 }
-APS5_EXPORT("g1Rc0MQddG0", FreetypeVectorTransform);
 
 int APS5_VABI sceFreeTypeOtUnknown_Ln9I6YfmYJU_nid_no_patch() {
     NotImplemented_nid_no_patch(__func__);
