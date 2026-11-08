@@ -55,6 +55,7 @@ public:
     bool Flush(bool ending);
     void CrashWrite(int standard, const char* text, std::size_t length);
     void Note(const char* text, std::size_t length);
+    void SetRotation(const std::string& path, std::uint64_t maxBytes, unsigned keep);
     bool FileFailed() const;
 
 private:
@@ -73,11 +74,17 @@ private:
     void pump(Stream& stream);
     void toFile(const char* data, std::size_t length);
     void flushCarry(Stream& stream);
+    bool rotate();
+    void failFile();
     void toTerminal(Stream& stream, const char* data, std::size_t length);
     void run(Stream& stream);
     Stream& streamOf(int standard);
 
     Handle _file;
+    std::string _path;
+    std::uint64_t _maxBytes = 0;
+    std::uint64_t _fileBytes = 0;
+    unsigned _keep = 0;
     Stream _streams[2];
     std::atomic<int> _lock{0};
     std::atomic<bool> _stop{false};
