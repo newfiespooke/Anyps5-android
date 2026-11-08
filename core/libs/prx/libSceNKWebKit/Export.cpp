@@ -11487,10 +11487,6 @@ int APS5_VABI WKCookieManagerStopObservingCookieChanges() {
 }
 
 
-int APS5_VABI WKFormSubmissionListenerContinue() {
-    NotImplemented_nid_no_patch(__func__);
-}
-
 int APS5_VABI WKFrameCanProvideSource() {
     NotImplemented_nid_no_patch(__func__);
 }
