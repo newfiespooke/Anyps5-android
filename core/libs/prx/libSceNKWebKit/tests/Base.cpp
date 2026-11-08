@@ -1653,6 +1653,49 @@ static void TestInspector() {
     }
     Require(threw);
 }
+static void TestBundle() {
+    Require(WKBundleGetTypeID() != 0);
+    auto bundle = NKWebKit::Make<NKWebKit::Bundle>();
+    const void* ref = bundle.Get();
+
+    Require(!bundle->historyCleared);
+    Require(!bundle->resourceLoadStatisticsCleared);
+    Require(!bundle->originAccessAllowListsReset);
+
+    WKBundleClearHistoryForTesting(ref);
+    Require(bundle->historyCleared);
+
+    WKBundleClearResourceLoadStatistics(ref);
+    Require(bundle->resourceLoadStatisticsCleared);
+
+    WKBundleResetOriginAccessAllowLists(ref);
+    Require(bundle->originAccessAllowListsReset);
+
+    bool threw = false;
+    try {
+        WKBundleClearHistoryForTesting(nullptr);
+    } catch (const std::invalid_argument&) {
+        threw = true;
+    }
+    Require(threw);
+
+    threw = false;
+    try {
+        WKBundleClearResourceLoadStatistics(nullptr);
+    } catch (const std::invalid_argument&) {
+        threw = true;
+    }
+    Require(threw);
+
+    threw = false;
+    try {
+        WKBundleResetOriginAccessAllowLists(nullptr);
+    } catch (const std::invalid_argument&) {
+        threw = true;
+    }
+    Require(threw);
+}
+
 int main() {
     TestTypeIDs();
     TestRetainRelease();
@@ -1682,6 +1725,7 @@ int main() {
 TestEmptyFrameLoaderClient();
 
 TestInspector();
+TestBundle();
     std::printf("All libSceNKWebKit Base tests passed!\n");
     return 0;
 }

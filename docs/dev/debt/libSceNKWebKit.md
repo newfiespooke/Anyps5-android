@@ -24,6 +24,7 @@ Inventory prose retains historical counts; use the [generated progress report](h
 - [WTF::Logger exports](../../../core/libs/prx/libSceNKWebKit/src/WtfLogger.cpp) have no console ABI or behavior verification. They follow the [PS5 11.x WebKit source](https://github.com/neonmodder123/PS5-WebKit-11.x/blob/80f77e94c63ee7202eec3d4b5b1a021dd89011ba/Source/WTF/wtf/Logger.cpp). A null `self`, a null method name or an oversized string throws instead of reproducing the upstream crash. Closes when: compared with a console module.
 
 ### Functional
+- [WKBundle clear and reset helpers](../../../core/libs/prx/libSceNKWebKit/src/Bundle.cpp) (libSceNKWebKit) - `WKBundleClearHistoryForTesting`, `WKBundleClearResourceLoadStatistics` and `WKBundleResetOriginAccessAllowLists` reset testing history, resource load statistics and origin access allow lists on the bundle instance; full injected bundle subsystem lifecycle and console execution are unverified.
 - [WTF ICU version queries](../../../core/libs/prx/libSceNKWebKit/src/WtfPrimitives.cpp) (libSceNKWebKit) - `WTF::ICU::majorVersion` and `WTF::ICU::minorVersion` follow [ICUHelpers.cpp](https://github.com/neonmodder123/PS5-WebKit-11.x/blob/80f77e94c63ee7202eec3d4b5b1a021dd89011ba/Source/WTF/wtf/unicode/icu/ICUHelpers.cpp) at commit `80f77e94c63ee7202eec3d4b5b1a021dd89011ba`. Both functions query the underlying ICU version via `u_getVersion_nid_postfix` with `std::call_once` synchronization and return version components `[0]` and `[1]`. Runtime version values reflect `libSceIcu`'s reported ICU 78.1 release and have not been measured against console hardware traces.
 
 - [WKURL URL component and comparison helpers](../../../core/libs/prx/libSceNKWebKit/src/URL.cpp) (libSceNKWebKit) - `WKURLCopyHostName`, `WKURLCopyPath`, `WKURLCopyScheme`, `WKURLCopyLastPathComponent`, `WKURLCreateWithBaseURL` and `WKURLIsEqual` create and inspect `WKURLRef` host objects, resolving relative URLs against base URLs and comparing canonical URL strings; console execution is unverified.
@@ -90,7 +91,7 @@ Inventory prose retains historical counts; use the [generated progress report](h
 - The [revision-pinned identity inventory](https://gist.github.com/kyon-eth/d44995f181e1818977bd38f0e6fc0f34/8afcb14b0707a09b6274ff7f7bcf33ef46cfe2e7) records the module, library, symbol type and NIDs for the declarations in [Export.cpp](../../../core/libs/prx/libSceNKWebKit/Export.cpp); it is a metadata summary rather than independent verification. For the 255 absent from the public catalogue, [per-image ELF records](https://gist.github.com/kyon-eth/147be8dd556e9cced2577ccbed548972/1a659ecfe819e724675991a574a1aebb5fbb48e5) include the raw qualified names, module and library identities, symbol type, values and sizes; the record file SHA-256 is `44bdc4d6073192a8f41b7be359b75364b3d41dbbd11ce649924b8cebdd4ffe51`. Image labels are not authenticated.
 
 - [WebCore text dumps](../../../core/libs/prx/libSceNKWebKit/src/WebCoreDump.cpp) (libSceNKWebKit) - the `operator<<(TextStream&, ...)` overloads for geometry, transforms, `ScrollAlignment` and scrolling and graphics enums follow the pinned [`FloatPoint.cpp`](https://github.com/neonmodder123/PS5-WebKit-11.x/blob/80f77e94c63ee7202eec3d4b5b1a021dd89011ba/Source/WebCore/platform/graphics/FloatPoint.cpp), [`GraphicsTypes.cpp`](https://github.com/neonmodder123/PS5-WebKit-11.x/blob/80f77e94c63ee7202eec3d4b5b1a021dd89011ba/Source/WebCore/platform/graphics/GraphicsTypes.cpp) and [`ScrollTypes.cpp`](https://github.com/neonmodder123/PS5-WebKit-11.x/blob/80f77e94c63ee7202eec3d4b5b1a021dd89011ba/Source/WebCore/platform/ScrollTypes.cpp); expectations are hand-derived and not checked against console binaries. They rely on the `TextStream` exports and layout of the WTF text change. `XYZ_D65` prints `XYZ-D50`, as in that source; a `CompositeOperator` or `BlendMode` outside its name table throws.
-- [Additional callable exports](../../../core/libs/prx/libSceNKWebKit/Export.cpp) - 6359 of the 8703 inventory declarations listed below throw through `NotImplemented_nid_no_patch`; signatures and behavior are unverified. The later 13.60-labelled image contains all 8703; 8448 match the public 3.20 catalogue, while 255 are absent and their presence in retail 3.20 is unverified. Per-image records show the latter in a separate 3.20-labelled image, but neither image label is authenticated. Identified names match NIDs in the [public symbol database](https://github.com/zecoxao/sce_symbols/blob/2883963a0a514ba6e77407a08ef4730a65e88254/aerolib.csv) or [supplemental catalog](https://github.com/claimore22/ps5rs/blob/2304be5131221bae0dac24b9767cabffda33f747/data/nids.csv). Data exports need separate analysis.
+- [Additional callable exports](../../../core/libs/prx/libSceNKWebKit/Export.cpp) - 6356 of the 8703 inventory declarations listed below throw through `NotImplemented_nid_no_patch`; signatures and behavior are unverified. The later 13.60-labelled image contains all 8703; 8448 match the public 3.20 catalogue, while 255 are absent and their presence in retail 3.20 is unverified. Per-image records show the latter in a separate 3.20-labelled image, but neither image label is authenticated. Identified names match NIDs in the [public symbol database](https://github.com/zecoxao/sce_symbols/blob/2883963a0a514ba6e77407a08ef4730a65e88254/aerolib.csv) or [supplemental catalog](https://github.com/claimore22/ps5rs/blob/2304be5131221bae0dac24b9767cabffda33f747/data/nids.csv). Data exports need separate analysis.
 
 | Name | NID |
 | --- | --- |
@@ -123,8 +124,6 @@ Inventory prose retains historical counts; use the [generated progress report](h
 | `WKAuthenticationDecisionListenerUseCredential` | `opFenFdq3F4` |
 | `WKBundleAddOriginAccessAllowListEntry` | `Ec6dqG56Kog` |
 | `WKBundleBackForwardListClear` | `uDz2mwaGQxc` |
-| `WKBundleClearHistoryForTesting` | `4XbhuyqB6pA` |
-| `WKBundleClearResourceLoadStatistics` | `zm7AblpGSLk` |
 | `WKBundleCreateWKDataFromUInt8Array` | `IOaozfGUAFI` |
 | `WKBundleDOMWindowExtensionCreate` | `fI5-EhJqxeA` |
 | `WKBundleDOMWindowExtensionGetFrame` | `VN5TX+cUFf4` |
@@ -322,7 +321,6 @@ Inventory prose retains historical counts; use the [generated progress report](h
 | `WKBundleRemoveAllWebNotificationPermissions` | `ldxacgzSYVM` |
 | `WKBundleRemoveOriginAccessAllowListEntry` | `YkgkKjq1zjk` |
 | `WKBundleReportException` | `JiaW5n2B77U` |
-| `WKBundleResetOriginAccessAllowLists` | `8wD6Sq3WBcA` |
 | `WKBundleResourceLoadStatisticsNotifyObserver` | `HWRP4l2b7pE` |
 | `WKBundleScriptWorldClearWrappers` | `MzpjLnMjdwE` |
 | `WKBundleScriptWorldCreateWorld` | `f2hz+NhGpbw` |
@@ -6462,6 +6460,7 @@ Inventory prose retains historical counts; use the [generated progress report](h
 | `Unknown` | `zpeJoENXwDY` |
 
 ### Functional
+- [WKBundle clear and reset helpers](../../../core/libs/prx/libSceNKWebKit/src/Bundle.cpp) (libSceNKWebKit) - `WKBundleClearHistoryForTesting`, `WKBundleClearResourceLoadStatistics` and `WKBundleResetOriginAccessAllowLists` reset testing history, resource load statistics and origin access allow lists on the bundle instance; full injected bundle subsystem lifecycle and console execution are unverified.
 - [HitTestResult getters](../../../core/libs/prx/libSceNKWebKit/src/HitTestResult.cpp) (libSceNKWebKit) - WKHitTestResult* getters return image/link/media/PDF URLs, link text, bounding box and content editable flag from the host object.
 
 - [WTF URL scalar helpers](../../../core/libs/prx/libSceNKWebKit/UrlHelpers.cpp) - The device WebKit revision and guest ABI are unmeasured. The port assumes a 16-byte release [StringView](https://github.com/neonmodder123/PS5-WebKit-11.x/blob/80f77e94c63ee7202eec3d4b5b1a021dd89011ba/Source/WTF/wtf/text/StringView.h), follows the published [UUID](https://github.com/neonmodder123/PS5-WebKit-11.x/blob/80f77e94c63ee7202eec3d4b5b1a021dd89011ba/Source/WTF/wtf/UUID.cpp), [URL](https://github.com/neonmodder123/PS5-WebKit-11.x/blob/80f77e94c63ee7202eec3d4b5b1a021dd89011ba/Source/WTF/wtf/URL.cpp) and [URLParser](https://github.com/neonmodder123/PS5-WebKit-11.x/blob/80f77e94c63ee7202eec3d4b5b1a021dd89011ba/Source/WTF/wtf/URLParser.cpp) behavior, and supports only the five built-in default ports. Testing-only port override exports still throw; nonempty null pointers throw rather than dereference.
