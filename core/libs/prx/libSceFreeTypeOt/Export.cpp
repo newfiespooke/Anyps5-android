@@ -532,6 +532,59 @@ std::uint32_t APS5_VABI ft_highpow2_nid_postfix(std::uint32_t value) {
     return std::bit_floor(value);
 }
 
+std::int64_t APS5_VABI FT_MulDiv_nid_postfix(std::int64_t a, std::int64_t b, std::int64_t c) {
+    return CheckedMulDiv(a, b, c, true, __func__);
+}
+
+std::int64_t APS5_VABI FT_MulFix_nid_postfix(std::int64_t a, std::int64_t b) {
+    return CheckedMulDiv(a, b, 0x10000, true, __func__);
+}
+
+std::int64_t APS5_VABI FT_DivFix_nid_postfix(std::int64_t a, std::int64_t b) {
+    return CheckedMulDiv(a, 0x10000, b, true, __func__);
+}
+
+std::int64_t APS5_VABI FT_RoundFix_nid_postfix(std::int64_t a) {
+    return (a + 0x8000 - (a < 0)) & ~0xFFFF;
+}
+
+std::int64_t APS5_VABI FT_CeilFix_nid_postfix(std::int64_t a) {
+    return (a + 0xFFFF) & ~0xFFFF;
+}
+
+std::int64_t APS5_VABI FT_FloorFix_nid_postfix(std::int64_t a) {
+    return a & ~0xFFFF;
+}
+
+void APS5_VABI FT_Matrix_Multiply_nid_postfix(const FreeType::GuestMatrix* a, FreeType::GuestMatrix* b) {
+    FT_Matrix_Multiply_Scaled_nid_postfix(a, b, 1);
+}
+
+int APS5_VABI FT_Matrix_Invert_nid_postfix(FreeType::GuestMatrix* matrix) {
+    constexpr int FtErrInvalidArgument = 6;
+    if (!matrix) {
+        return FtErrInvalidArgument;
+    }
+    const std::int64_t delta = CheckedMulDiv(matrix->xx, matrix->yy, 0x10000, true, __func__) -
+                               CheckedMulDiv(matrix->xy, matrix->yx, 0x10000, true, __func__);
+    if (delta == 0) {
+        return FtErrInvalidArgument;
+    }
+    const std::int64_t xx = CheckedMulDiv(matrix->yy, 0x10000, delta, true, __func__);
+    const std::int64_t xy = -CheckedMulDiv(matrix->xy, 0x10000, delta, true, __func__);
+    const std::int64_t yx = -CheckedMulDiv(matrix->yx, 0x10000, delta, true, __func__);
+    const std::int64_t yy = CheckedMulDiv(matrix->xx, 0x10000, delta, true, __func__);
+    matrix->xx = xx;
+    matrix->xy = xy;
+    matrix->yx = yx;
+    matrix->yy = yy;
+    return 0;
+}
+
+void APS5_VABI FT_Vector_Transform_nid_postfix(FreeType::GuestVector* vector, const FreeType::GuestMatrix* matrix) {
+    FT_Vector_Transform_Scaled_nid_postfix(vector, matrix, 1);
+}
+
 int APS5_VABI sceFreeTypeOtUnknown_Ln9I6YfmYJU_nid_no_patch() {
     NotImplemented_nid_no_patch(__func__);
 }
