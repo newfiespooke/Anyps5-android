@@ -20,3 +20,7 @@
 #include "Identified.hpp"
 
 #include "prx/libSceIcu/include/Api.hpp"
+
+#include "BreakIterator.hpp"
+#include "Data.hpp"
+#include "Configuration.hpp"

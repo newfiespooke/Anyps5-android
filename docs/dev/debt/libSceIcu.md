@@ -51,7 +51,7 @@
 
 - [Character iterators](../../../core/libs/prx/libSceIcu/Iterator.cpp) are unverified on a console. `uiter_setString` and `uiter_setUTF8`, which firmware 13.42 exports ([#11013](https://github.com/boykopovar/AnyPS5/pull/11013#issuecomment-6401310351)), fill the 112-byte `UCharIterator` with guest-ABI callbacks ported from ICU 78.1 [uiter.cpp](https://github.com/unicode-org/icu/blob/release-78.1/icu4c/source/common/uiter.cpp), including its lazy UTF-8 index, split supplementary characters, packed UTF-8 state, wrapping index arithmetic and its forward-move quirk that overwrites a just-known index. Ill-formed UTF-8 decodes to U+FFFD per maximal subpart as `U8_NEXT_OR_FFFD` and `U8_PREV_OR_FFFD` do. Callbacks given a null iterator, and the no-op `setState` given a null error pointer, throw where ICU dereferences them. Closes when: compared with the console.
 
-- [Character property](../../../core/libs/prx/libSceIcu/Properties.cpp) and [case mapping](../../../core/libs/prx/libSceIcu/CaseMapping.cpp) exports throw `NotImplemented_nid_no_patch` where ICU 78.1 needs a data file this build does not have: `u_hasBinaryProperty` and `u_getIntPropertyValue` for emoji, NFKC, NFKC_Casefold, Indic positional and syllabic category and vertical orientation properties, `u_getIntPropertyMaxValue` for the last three, and `u_strToLower` and `u_strToUpper` with a null (default) locale. Prototypes follow the ICU 78.1 headers; other inputs follow its compiled-in tables from the [3rdparty/icu](https://github.com/unicode-org/icu/tree/049e0d6a4206/icu4c/source/common) submodule; null pointers ICU dereferences and lengths below -1 throw `std::invalid_argument`. Closes when: compared with the console and the data files are available.
+- [Character property](../../../core/libs/prx/libSceIcu/Properties.cpp) and [case mapping](../../../core/libs/prx/libSceIcu/CaseMapping.cpp) exports retain their #13578 `NotImplemented_nid_no_patch` guards for data-dependent inputs despite the filtered package: `u_hasBinaryProperty` and `u_getIntPropertyValue` for emoji, NFKC, NFKC_Casefold, Indic positional and syllabic category and vertical orientation properties, `u_getIntPropertyMaxValue` for the last three, and `u_strToLower` and `u_strToUpper` with a null (default) locale. Prototypes follow the ICU 78.1 headers; other inputs follow its compiled-in tables from the [3rdparty/icu](https://github.com/unicode-org/icu/tree/049e0d6a4206/icu4c/source/common) submodule; null pointers ICU dereferences and lengths below -1 throw `std::invalid_argument`. Closes when: compared with the console and the data files are available.
 
 ### Known export names; ABI prototypes unverified
 
@@ -59,3 +59,36 @@
 - The 24 named stubs declared in [Identified.hpp](../../../core/libs/prx/libSceIcu/Identified.hpp) carry the ICU C API names whose `tools/nid_names.py` hash equals the inventory NID; the names were taken from the identifiers of the ICU 78.1 `common`, `i18n` and `io` sources. A name match does not show that the console function has ICU's prototype or behavior. Most of them read resource, converter or character-name data that no host library provides.
 
 - [Resource type classification](../../../core/libs/prx/libSceIcu/Resource.cpp) has no console ABI or behavior verification. `res_getPublicType` (NID `WPrktCwd+iw` in the PS5 3.20 inventory above) takes an unsigned 32-bit resource and returns a signed 32-bit public type, following ICU 65.1 and [ICU 78.1](https://github.com/unicode-org/icu/blob/049e0d6a420629ac7db77256987d083a563287b5/icu4c/source/common/uresdata.cpp). Both use the same mapping of the high four bits; the low 28 bits do not affect the result. Cross-firmware export availability and native behavior remain unverified. Closes when: compared with the console.
+
+### Data and C break iteration
+
+- [Source-built data](../../../cmake/IcuData.cmake) is not compared with console data. Native tools from ICU 78.1's pinned submodule run its `BUILDRULES.py` through `icutools.databuilder`, then `icupkg` and `genccode` link a common package through ICU's standard `icudt78_dat` entry point. The [additive filter](../../../cmake/IcuDataFilter.json) retains all break rules, dictionaries, break locales, locale availability and parent/alias resources, converter aliases, normalization, layout, emoji and miscellaneous dependencies. Optional LSTM and AdaBoost models are excluded: ICU falls back to dictionary segmentation; console model selection is unverified. Other locale resources and API families are excluded; widen the filter for follow-ups. Guest file I/O remains disabled as in #13578; `udata_setFileAccess` stores the policy without validating it or consulting status, exactly as ICU's setter does. Closes when: compared with console data.
+
+- [Native host tools](../../../cmake/icu-host/CMakeLists.txt) use a separate CMake build even for cross builds. Windows MinGW and macOS execution remain unverified. Closes when: tested on those hosts.
+
+- [C break iterators](../../../core/libs/prx/libSceIcu/BreakIterator.cpp) have unverified console ABI and behavior. The 14 plain-name exports below forward to pinned ICU 78.1 [ubrk.cpp](https://github.com/unicode-org/icu/blob/049e0d6a420629ac7db77256987d083a563287b5/icu4c/source/common/ubrk.cpp); guest `UChar` is 16-bit, `UBool` 8-bit and status 32-bit. ICU retains the caller's UTF-16 buffer without copying; it must remain alive and unchanged until replacement or close. Handles belong to this backend and cannot be mixed with ICU 68 objects. Null handles or status pointers throw where ICU dereferences them; negative locale indices and index equal to the count throw where `locavailable.cpp` reads outside its allocated array; other arguments and status values pass through ICU. UText callbacks, rule construction, cloning and locale-query exports remain unavailable. Closes when: compared with the console.
+
+- [Data registration](../../../core/libs/prx/libSceIcu/Data.cpp) has unverified console behavior. The two plain-name setters below follow ICU 78.1 [udata.cpp](https://github.com/unicode-org/icu/blob/049e0d6a420629ac7db77256987d083a563287b5/icu4c/source/common/udata.cpp). Common data must be correctly aligned and remain alive while ICU uses it; ICU validates the header, not the extent of caller storage. A null status is a no-op for common-data registration and is ignored by file-access configuration. Closes when: compared with the console.
+
+- [Allocator integration](../../../core/libs/prx/libSceIcu/Configuration.cpp) is unverified on the console. #13578 predates main's configuration exports; this stack brings forward only `u_setMemoryFunctions` and `u_cleanup`. Native callback thunks invoke the configured guest-ABI allocator for ICU allocation, reallocation and freeing. Close releases per-handle allocations; shared caches survive until native `u_cleanup`, which runs before clearing the callbacks. Reconfiguration and cleanup require no concurrent use or outstanding handles, as in ICU. Hand-ported objects retain their own allocation paths. Firmware availability remains as recorded under ICU export availability; no ICU 68 C++ objects are changed. Closes when: compared with the console, including the guest callbacks on Windows.
+
+The 16 plain-name exports are absent from #13578's older base and throwing placeholders on current main; they are additional to that base's unchanged 44 older stubs and 24 identified stubs. Names/NIDs follow main's checked [per-image inventory](https://gist.github.com/kyon-eth/a8e9ce3fc8802f48d30cd94c413904b7/211c546f6f8e79a23b5ec6ea8fd0610527beabee), whose image provenance is unverified.
+
+| Name | NID |
+| --- | --- |
+| `ubrk_close` | `-Hc6XkAq-eU` |
+| `ubrk_countAvailable` | `bZT8JIrrg3I` |
+| `ubrk_current` | `fsgqunLD2b8` |
+| `ubrk_first` | `cL3dlqTcRqk` |
+| `ubrk_following` | `dC+0Pz5afr0` |
+| `ubrk_getAvailable` | `+Nd4bYkEgRc` |
+| `ubrk_getRuleStatus` | `av8J5NBkbRE` |
+| `ubrk_isBoundary` | `ypOz3lP3VhE` |
+| `ubrk_last` | `n6SEUE4Txvg` |
+| `ubrk_next` | `4Uj1DZGlHTw` |
+| `ubrk_open` | `NfGO57hqUEw` |
+| `ubrk_preceding` | `9hkT1aMC0Rs` |
+| `ubrk_previous` | `tGeOQLpMGgA` |
+| `ubrk_setText` | `NtjY-lZG4ss` |
+| `udata_setCommonData` | `wHZwCpZVcGI` |
+| `udata_setFileAccess` | `mCyTdtewGpk` |
