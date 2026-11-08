@@ -273,7 +273,7 @@ static void RequireSettimeError(int clockId, const KernelTimespec* time, int err
     Require(clock_settime_nid_postfix(clockId, time) == -1 && *__error_nid_postfix() == error);
 }
 
-static void SettimeIsRefusedLikeAJailedProcess() {
+static void SettimeValidatesLikeFreebsd() {
     const KernelTimespec valid{1767225600, 5};
     RequireSettimeError(GUEST_CLOCK_REALTIME, nullptr, 14);
     RequireSettimeError(GUEST_CLOCK_MONOTONIC, nullptr, 14);
@@ -281,13 +281,17 @@ static void SettimeIsRefusedLikeAJailedProcess() {
         RequireSettimeError(GUEST_CLOCK_REALTIME, reinterpret_cast<const KernelTimespec*>(bad), 14);
         RequireSettimeError(GUEST_CLOCK_MONOTONIC, reinterpret_cast<const KernelTimespec*>(bad), 14);
     }
+    for (const int clockId : {GUEST_CLOCK_VIRTUAL, GUEST_CLOCK_PROF, GUEST_CLOCK_MONOTONIC, GUEST_CLOCK_REALTIME_PRECISE,
+             GUEST_CLOCK_SECOND, GUEST_CLOCK_THREAD_CPUTIME_ID, GUEST_CLOCK_PROCESS_CPUTIME_ID, -1, 16})
+        RequireSettimeError(clockId, &valid, 22);
     const KernelTimespec negativeNanoseconds{0, -1};
     const KernelTimespec wholeSecondOfNanoseconds{0, NANOS_PER_SECOND};
     const KernelTimespec negativeSeconds{-1, 0};
-    for (const int clockId : {GUEST_CLOCK_REALTIME, GUEST_CLOCK_VIRTUAL, GUEST_CLOCK_PROF, GUEST_CLOCK_MONOTONIC, GUEST_CLOCK_REALTIME_PRECISE,
-             GUEST_CLOCK_SECOND, GUEST_CLOCK_THREAD_CPUTIME_ID, GUEST_CLOCK_PROCESS_CPUTIME_ID, -1, 16})
-        for (const KernelTimespec* time : {&valid, &negativeNanoseconds, &wholeSecondOfNanoseconds, &negativeSeconds})
-            RequireSettimeError(clockId, time, 1);
+    RequireSettimeError(GUEST_CLOCK_REALTIME, &negativeNanoseconds, 22);
+    RequireSettimeError(GUEST_CLOCK_REALTIME, &wholeSecondOfNanoseconds, 22);
+    RequireSettimeError(GUEST_CLOCK_REALTIME, &negativeSeconds, 22);
+    RequireSettimeError(GUEST_CLOCK_MONOTONIC, &negativeSeconds, 22);
+    RequireSettimeError(GUEST_CLOCK_REALTIME, &valid, 1);
     KernelTimespec now{};
     Require(clock_gettime_nid_postfix(GUEST_CLOCK_REALTIME, &now) == 0 && now.tv_sec > 0 && now.tv_sec != valid.tv_sec);
 }
@@ -362,7 +366,7 @@ int main() {
     UnsupportedResolutionStillThrows();
     OmittedTimeIsFaultAfterClockValidation();
     InvalidClockIdFailsGettime();
-    SettimeIsRefusedLikeAJailedProcess();
+    SettimeValidatesLikeFreebsd();
     CalendarConversionsInitializeTheirState();
     CalendarConversionsFollowTheHostZone();
     TimezoneReportsTheStandardOffsetAndDaylightAmount();
