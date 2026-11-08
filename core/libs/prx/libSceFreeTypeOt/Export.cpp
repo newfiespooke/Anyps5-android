@@ -7,6 +7,8 @@
 #include "prx/libSceFreeTypeOt/include/Calc.hpp"
 #include "prx/libc/include/General.hpp"
 
+void FreeTypeOtStrokerExport(void* stroker, FreeType::GuestOutline* outline);
+
 namespace {
 
 std::uint64_t Magnitude(std::int64_t value) {
@@ -378,8 +380,8 @@ int APS5_VABI sceFreeTypeOtStrokerEndSubPath_nid_no_patch() {
 }
 APS5_EXPORT("pBqh-Uh-gns", sceFreeTypeOtStrokerEndSubPath_nid_no_patch);
 
-int APS5_VABI sceFreeTypeOtStrokerExport_nid_no_patch() {
-    NotImplemented_nid_no_patch(__func__);
+void APS5_VABI sceFreeTypeOtStrokerExport_nid_no_patch(void* stroker, FreeType::GuestOutline* outline) {
+    FreeTypeOtStrokerExport(stroker, outline);
 }
 APS5_EXPORT("2rcvKZfm5rI", sceFreeTypeOtStrokerExport_nid_no_patch);
 
