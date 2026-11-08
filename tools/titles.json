@@ -24,7 +24,7 @@
   "PPSA99007": {"seconds": 30},
   "PPSA99008": {"relink": ["--trap-sdk-syscall-stubs"], "seconds": 30},
   "PPSA99009": {"seconds": 30},
-  "PPSA99010": {"seconds": 30, "files": {"app0/id1/autoexec.cfg": {"text": "r_rtshadows 0\n"}, "app0/id1/pak0.pak": {"content": "quake/pak0.pak"}}},
+  "PPSA99010": {"files": {"app0/id1/autoexec.cfg": {"text": "r_rtshadows 0\n"}, "app0/id1/pak0.pak": {"content": "quake/pak0.pak"}}},
   "PPSA99011": {"relink": ["--trap-sdk-syscall-stubs"]},
   "PPSA99082": {"seconds": 30},
   "PPSA99109": {"seconds": 30},
