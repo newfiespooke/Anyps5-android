@@ -2,6 +2,7 @@
 #define CORE_LIBS_PRX_LIBSCEVIDEOOUT_INCLUDE_DISPLAYWINDOW_HPP
 
 #include <cstdint>
+#include <string>
 #include "SDL.h"
 
 inline constexpr std::uint32_t DisplayWindowMinimumWidth = 320;
@@ -11,6 +12,7 @@ inline constexpr std::uint32_t DisplayWindowInitialSizePercent = 60;
 namespace frame_watchdog {
 
 void Beat() noexcept;
+bool ParseHangSeconds(const char* text, std::uint32_t& seconds, std::string& error);
 
 }
 
