@@ -385,7 +385,7 @@ private:
     void recordQueuedLabelsBeforeRead(std::uint32_t queue);
     bool recordQueuedLabelsAfterCapture(std::uint32_t queue, std::span<const ShaderRecompiler::MemoryRegion> regions);
     static void runCaptureCheckHook();
-    static bool capturedMemoryChanged(std::span<const ShaderRecompiler::MemoryRegion> regions, std::span<Graphics::GuestMemorySnapshot> compared = {});
+    static bool capturedMemoryChanged(std::span<const ShaderRecompiler::MemoryRegion> regions, std::span<Graphics::GuestMemorySnapshot> compared = {}, std::span<const std::pair<std::uint64_t, std::uint64_t>> kept = {});
     void noteQueuedLabels(std::uint32_t queue);
     void recordQueuedLabelsByTry(std::uint32_t queue, std::atomic<std::uint64_t>& counter);
     static void recordQueuedLabelsFromHook();
