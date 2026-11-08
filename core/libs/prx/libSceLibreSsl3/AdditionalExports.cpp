@@ -96,10 +96,6 @@ int APS5_VABI TLS_server_method_nid_postfix() {
     NotImplemented_nid_no_patch(__func__);
 }
 
-int APS5_VABI X509_EXTENSION_free_nid_postfix() {
-    NotImplemented_nid_no_patch(__func__);
-}
-
 int APS5_VABI X509_STORE_CTX_get0_param_nid_postfix() {
     NotImplemented_nid_no_patch(__func__);
 }
@@ -327,10 +323,6 @@ int APS5_VABI ASN1_TIME_new_nid_postfix() {
 }
 
 int APS5_VABI X509_set_issuer_name_nid_postfix() {
-    NotImplemented_nid_no_patch(__func__);
-}
-
-int APS5_VABI X509_add_ext_nid_postfix() {
     NotImplemented_nid_no_patch(__func__);
 }
 
