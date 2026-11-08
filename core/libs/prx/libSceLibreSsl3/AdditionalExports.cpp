@@ -80,10 +80,6 @@ int APS5_VABI SSL_set_accept_state_nid_postfix() {
     NotImplemented_nid_no_patch(__func__);
 }
 
-int APS5_VABI SSL_set_alpn_protos_nid_postfix() {
-    NotImplemented_nid_no_patch(__func__);
-}
-
 int APS5_VABI TLS_method_nid_postfix() {
     NotImplemented_nid_no_patch(__func__);
 }
