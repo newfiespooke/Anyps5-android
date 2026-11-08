@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <source_location>
 #include <cstdlib>
+#include <stdexcept>
 
 namespace {
 void Require(bool condition, std::source_location location = std::source_location::current()) {
@@ -35,6 +36,12 @@ int main() {
     Require(X509_get0_pubkey_nid_postfix(&certificate) == &pkey);
     publicKey.pkey = nullptr;
     Require(X509_get0_pubkey_nid_postfix(&certificate) == nullptr);
+    LibreSsl3Asn1String encoded{};
+    publicKey.publicKey = &encoded;
+    bool threw = false;
+    try { X509_get0_pubkey_nid_postfix(&certificate); } catch (const std::runtime_error&) { threw = true; }
+    Require(threw);
+    publicKey.publicKey = nullptr;
     info.key = nullptr;
     Require(X509_get_X509_PUBKEY_nid_postfix(&certificate) == nullptr);
     Require(X509_get0_pubkey_nid_postfix(&certificate) == nullptr);

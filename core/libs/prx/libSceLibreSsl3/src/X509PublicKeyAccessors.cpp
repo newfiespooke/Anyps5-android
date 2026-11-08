@@ -1,4 +1,5 @@
 #include "prx/libSceLibreSsl3/include/Api.hpp"
+#include "prx/libc/include/General.hpp"
 #include <cstddef>
 
 namespace {
@@ -26,7 +27,9 @@ void* APS5_VABI X509_get_X509_PUBKEY_nid_postfix(const LibreSsl3X509* certificat
 
 void* APS5_VABI X509_get0_pubkey_nid_postfix(const LibreSsl3X509* certificate) {
     auto* key = static_cast<const LibreSsl3X509Pubkey*>(X509_get_X509_PUBKEY_nid_postfix(certificate));
-    return key ? key->pkey : nullptr;
+    if (!key) return nullptr;
+    if (!key->pkey && key->publicKey) NotImplemented_nid_no_patch("X509_get0_pubkey");
+    return key->pkey;
 }
 
 }
