@@ -48,6 +48,7 @@ struct CaptureProfile {
     std::atomic<std::uint64_t> wordsVerified{0};
     std::atomic<std::uint64_t> wordMismatches{0};
     // Words served from the driver's known values (never profile-gated: the [copy] line reads them).
+    std::atomic<std::uint64_t> tablesKept{0};
     std::atomic<std::uint64_t> wordsKnown{0};
     std::atomic<std::uint64_t> wordsKnownVerified{0};
     std::atomic<std::uint64_t> wordsKnownMismatches{0};
@@ -545,7 +546,12 @@ bool ShaderMemory::KeepTable(std::uint64_t address) {
     }
     GuestMemory::GuardRead(address, KeepBytes);
     keptRanges.emplace_back(address, end);
+    CaptureTotals().tablesKept.fetch_add(1, std::memory_order_relaxed);
     return true;
+}
+
+std::uint64_t ShaderMemory::TablesKept() {
+    return CaptureTotals().tablesKept.load(std::memory_order_relaxed);
 }
 
 GuestMemory::Compare ShaderMemory::CompareOutsideKept(const ShaderRecompiler::MemoryRegion& region, std::span<const std::pair<std::uint64_t, std::uint64_t>> kept) {

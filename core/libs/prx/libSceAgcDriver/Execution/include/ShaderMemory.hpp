@@ -64,6 +64,7 @@ public:
     ~ShaderMemory();
     static constexpr std::size_t KeepBytes = 256;
     bool KeepTable(std::uint64_t address);
+    static std::uint64_t TablesKept();
     [[nodiscard]] std::span<const std::pair<std::uint64_t, std::uint64_t>> KeptRanges() const { return keptRanges; }
     static GuestMemory::Compare CompareOutsideKept(const ShaderRecompiler::MemoryRegion& region, std::span<const std::pair<std::uint64_t, std::uint64_t>> kept);
     ShaderMemory(const ShaderMemory&) = delete;
