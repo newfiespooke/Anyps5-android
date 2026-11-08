@@ -321,6 +321,11 @@ int APS5_VABI scePthreadMutexGetspinloops(PthreadMutex* mutex, int* count) {
 }
 
 int APS5_VABI scePthreadMutexSetspinloops(PthreadMutex* mutex, int count) {
+    if (mutex) {
+        PthreadMutex probe = nullptr;
+        if (!GuestCopyIn_nid_no_patch(&probe, mutex, sizeof(probe)))
+            return SCE_KERNEL_ERROR_EFAULT;
+    }
     auto* current = resolveMutex(mutex, true);
     if (!current)
         return SCE_KERNEL_ERROR_EINVAL;
@@ -344,6 +349,11 @@ int APS5_VABI scePthreadMutexGetyieldloops(PthreadMutex* mutex, int* count) {
 }
 
 int APS5_VABI scePthreadMutexSetyieldloops(PthreadMutex* mutex, int count) {
+    if (mutex) {
+        PthreadMutex probe = nullptr;
+        if (!GuestCopyIn_nid_no_patch(&probe, mutex, sizeof(probe)))
+            return SCE_KERNEL_ERROR_EFAULT;
+    }
     auto* current = resolveMutex(mutex, true);
     if (!current)
         return SCE_KERNEL_ERROR_EINVAL;
