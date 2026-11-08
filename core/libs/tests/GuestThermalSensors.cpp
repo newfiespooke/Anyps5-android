@@ -74,9 +74,17 @@ int main() {
         *__error_nid_postfix() = 0;
         Require(sceKernelGetSocSensorTemperature(invalid, nullptr) == SCE_KERNEL_ERROR_EINVAL && *__error_nid_postfix() == 22);
     }
-    for (const int unmapped : {3, 15, 32}) {
+    for (const int unmapped : {3, 15, 32, 63}) {
         *__error_nid_postfix() = 0;
         Require(sceKernelGetSocSensorTemperature(unmapped, nullptr) == SCE_KERNEL_ERROR_EFAULT && *__error_nid_postfix() == 14);
+        int unmappedProbe = -1;
+        bool threw = false;
+        try {
+            (void)sceKernelGetSocSensorTemperature(unmapped, &unmappedProbe);
+        } catch (const std::runtime_error& error) {
+            threw = std::string(error.what()).find("have no host sensor") != std::string::npos;
+        }
+        Require(threw);
     }
 
     int probe = -12345;
