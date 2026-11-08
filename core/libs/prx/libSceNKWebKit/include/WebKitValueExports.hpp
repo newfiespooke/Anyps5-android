@@ -246,4 +246,7 @@ std::uint32_t APS5_VABI WKWebsiteDataStoreGetTypeID();
 std::uint32_t APS5_VABI WKWebsitePoliciesGetTypeID();
 std::uint32_t APS5_VABI WKWindowFeaturesGetTypeID();
 
+void APS5_VABI WKApplicationCacheManagerDeleteAllEntries(const void* managerRef);
+void APS5_VABI WKApplicationCacheManagerDeleteEntriesForOrigin(const void* managerRef, const void* originRef);
+void APS5_VABI WKApplicationCacheManagerGetApplicationCacheOrigins(const void* managerRef, void* context, void (*callback)(const void*, const void*, void*));
 }

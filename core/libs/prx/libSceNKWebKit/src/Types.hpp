@@ -254,4 +254,18 @@ public:
     bool isVisible = false;
 };
 
+
+class ApplicationCacheManager final : public ObjectOf<ObjectType::ApplicationCacheManager> {
+public:
+    std::vector<std::string> origins;
+
+    void DeleteAll() {
+        origins.clear();
+    }
+
+    void DeleteForOrigin(const std::string& origin) {
+        std::erase(origins, origin);
+    }
+};
+
 }  // namespace NKWebKit
