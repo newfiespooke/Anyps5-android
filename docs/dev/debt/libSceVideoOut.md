@@ -302,3 +302,4 @@
 ### Host screen keep-awake
 
 - [Wayland](../../../core/libs/prx/libSceVideoOut/src/KeepAwake.cpp) - not verified. SDL 2.33.0 (bundled) suspends the screen saver on Wayland through the idle-inhibit protocol, one inhibitor per window surface, when the compositor offers it; no Wayland session was available here, so whether the screen stays awake under a given compositor is unmeasured.
+- [macOS](../../../core/libs/prx/libSceVideoOut/src/KeepAwake.cpp) - not verified. SDL 2.33.0 creates an IOPMAssertion (PreventUserIdleDisplaySleep) when the screen saver is suspended; no macOS host was available here, so the display sleep behaviour is unmeasured.
