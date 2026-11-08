@@ -12709,13 +12709,9 @@ int APS5_VABI WKTextCheckerSetTestingMode() {
     NotImplemented_nid_no_patch(__func__);
 }
 
-int APS5_VABI WKUserContentExtensionStoreCompile() {
-    NotImplemented_nid_no_patch(__func__);
-}
 
-int APS5_VABI WKUserContentExtensionStoreLookup() {
-    NotImplemented_nid_no_patch(__func__);
-}
+
+
 
 int APS5_VABI WKUserMediaPermissionCheckSetUserMediaAccessInfo() {
     NotImplemented_nid_no_patch(__func__);

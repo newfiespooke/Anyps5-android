@@ -254,4 +254,10 @@ public:
     bool isVisible = false;
 };
 
+
+class ContentRuleListStore final : public ObjectOf<ObjectType::ContentRuleListStore> {
+public:
+    std::map<std::u16string, Retained<Object>> filters;
+};
+
 }  // namespace NKWebKit
