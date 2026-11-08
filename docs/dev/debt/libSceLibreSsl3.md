@@ -73,7 +73,7 @@
 
 ### Additional callable export inventory
 
-- [Additional exports](../../../core/libs/prx/libSceLibreSsl3/AdditionalExports.cpp) declare 117 still-unimplemented callable exports: 108 named and 9 known only by NID. These entries throw. Parameterless `int` declarations are unknown-signature placeholders, not verified ABI contracts. Names/NIDs match the 13.60 export table. The fourteen libtls lifecycle/config exports are implemented in `LibTls.cpp`; title compatibility beyond preconnection behavior remains unverified.
+- [Additional exports](../../../core/libs/prx/libSceLibreSsl3/AdditionalExports.cpp) declare 113 still-unimplemented callable exports: 104 named and 9 known only by NID. These entries throw. Parameterless `int` declarations are unknown-signature placeholders, not verified ABI contracts. Names/NIDs match the 13.60 export table. The fourteen libtls lifecycle/config exports are implemented in `LibTls.cpp`; title compatibility beyond preconnection behavior remains unverified.
 
 | Name | NID |
 | --- | --- |
@@ -96,7 +96,6 @@
 | `i2d_SSL_SESSION` | `5aSlVeVSKVc` |
 | `tls_read` | `7RvDjfy4gUA` |
 | `EC_POINT_set_affine_coordinates_GFp` | `8AGfaSvdDq4` |
-| `SSL_CTX_set_max_early_data` | `8kct4CSWwOA` |
 | `X509_STORE_CTX_get0_param` | `8wroYNJAQpo` |
 | `unknown` | `A-Hs-8mau+8` |
 | `ERR_load_X509_strings` | `A0lZtFjhcTw` |
@@ -105,7 +104,6 @@
 | `SSL_CTX_set_timeout` | `BBOgwZLvXHA` |
 | `X509_get_ext_by_NID` | `BRjfzlGULmU` |
 | `X509_check_akid` | `C7eFtWPfLdk` |
-| `SSL_set_quic_use_legacy_codepoint` | `CFRaBB2+R+s` |
 | `SSL_CTX_set_default_verify_paths` | `DZ6fywqpaik` |
 | `TLS_server_method` | `EtM5Jwx4EFo` |
 | `ERR_lib_error_string` | `F7jknWesBTY` |
@@ -146,7 +144,6 @@
 | `tls_connect_socket` | `ZERQN8ewpgk` |
 | `SSL_CTX_set_quic_method` | `ZFeTGo4ybcw` |
 | `X509_gmtime_adj` | `ZQ3b6SakHkc` |
-| `SSL_process_quic_post_handshake` | `aKGUCnoiE+k` |
 | `unknown` | `aLdgrI2jAF0` |
 | `EC_POINT_clear_free` | `aSO3Svp7umY` |
 | `d2i_PKCS8_PRIV_KEY_INFO` | `as+t2ZOg5fw` |
@@ -186,7 +183,6 @@
 | `EVP_PKEY_CTX_free` | `ulzAPWCIBkw` |
 | `d2i_ASN1_SEQUENCE_ANY` | `vR0po3nBkBs` |
 | `PKCS5_PBKDF2_HMAC` | `vnwZHU5FvBQ` |
-| `SSL_CTX_set_post_handshake_auth` | `wHdymWL7CbE` |
 | `X509_EXTENSION_free` | `wbJDMMsje6s` |
 | `OBJ_obj2txt` | `xZ1BME5qDv0` |
 | `SSL_set_quic_transport_params` | `xf6anoZpWRM` |
