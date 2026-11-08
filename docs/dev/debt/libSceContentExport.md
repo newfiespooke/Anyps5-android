@@ -6,6 +6,8 @@
 
 - [sceContentExportFromData](../../../core/libs/prx/libSceContentExport/Export.cpp) (libSceContentExport) - validates the export session and throws as unimplemented. Two titles disassembled for this entry call it once each with 7 arguments: PPSA01746 (0xba0e14) between `sceContentExportStart` and `sceContentExportFinish`, treating any result other than 0 as failure, and the ContentManagement plugin of PPSA06465 (0x11f9), treating a negative result as failure and any other as success. What the arguments and the callback mean is not shown.
 
+- [sceContentExportInit2](../../../core/libs/prx/libSceContentExport/Export.cpp) (libSceContentExport) - throwing std::invalid_argument for unmapped or unreadable parameter pointers is a host-safety fallback; whether console hardware faults or returns an argument error on unmapped memory is unmeasured.
+
 ### Unknown function info
 
 - [sceContentExportDataProvideFunction, sceContentExportFree, sceContentExportFrom and sceContentExportMalloc](../../../core/libs/prx/libSceContentExport/Export.cpp): their signatures remain unresolved; these names have no matching exports in the supplied module's C or assembly listing.
