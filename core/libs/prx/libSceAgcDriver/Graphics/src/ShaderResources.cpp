@@ -276,7 +276,7 @@ void eraseTexture(TextureCache& cache, std::list<CachedTexture>::iterator it) {
             }
         }
     }
-    if (it->texture.use_count() > 1) noteReleased(it->texture);
+    if (it->accounted != 0 && it->texture.use_count() > 1) noteReleased(it->texture);
     cache.index.erase(it->key);
     cache.entries.erase(it);
     ++cache.erasures;
