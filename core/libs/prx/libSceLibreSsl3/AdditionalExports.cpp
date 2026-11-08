@@ -108,10 +108,6 @@ int APS5_VABI X509_STORE_load_locations_nid_postfix() {
     NotImplemented_nid_no_patch(__func__);
 }
 
-int APS5_VABI X509_get0_pubkey_nid_postfix() {
-    NotImplemented_nid_no_patch(__func__);
-}
-
 int APS5_VABI d2i_SSL_SESSION_nid_postfix() {
     NotImplemented_nid_no_patch(__func__);
 }
@@ -470,10 +466,6 @@ int APS5_VABI SSL_set_quic_transport_params_nid_postfix() {
 }
 
 int APS5_VABI SSL_is_quic_nid_postfix() {
-    NotImplemented_nid_no_patch(__func__);
-}
-
-int APS5_VABI X509_get_X509_PUBKEY_nid_postfix() {
     NotImplemented_nid_no_patch(__func__);
 }
 
