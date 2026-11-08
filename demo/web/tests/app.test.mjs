@@ -40,12 +40,14 @@ async function setup(t, name) {
   }
   const globals = {
     document: {
+      documentElement: { lang: "", dir: "" },
       getElementById: get,
       createElement: () => new Element(),
       querySelector: selector => {
         assert.equal(selector, 'input[name="target"]:checked');
         return { value: "linux" };
-      }
+      },
+      querySelectorAll: () => []
     },
     window: { isSecureContext: true, Worker, WebAssembly, ReadableStream, WritableStream, crypto: { subtle: {} } },
     Worker,
