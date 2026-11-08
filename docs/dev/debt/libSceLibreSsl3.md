@@ -4,6 +4,7 @@
 - [`X509_PUBKEY_get0_param`](../../../core/libs/prx/libSceLibreSsl3/src/X509PubkeyParam.cpp) follows LibreSSL 4.0.0 `crypto/asn1/x_pubkey.c` at [`ce488b78e0bd994780569df718596b9776ff681a`](https://github.com/libressl/openbsd/blob/ce488b78e0bd994780569df718596b9776ff681a/src/lib/libcrypto/asn1/x_pubkey.c) and its `x509_local.h`, `x509.h` and `asn1.h` layouts. The function returns borrowed pointers and writes the encoded key length only when the key output is requested. The PS5 layout and malformed-object behavior are not verified on hardware; layout assertions match the pinned x86-64 source declarations.
 ### Functional
 
+- [EVP_PKEY_assign, EVP_PKEY_set1_EC_KEY and EVP_PKEY_get1_RSA](../../../core/libs/prx/libSceLibreSsl3/src/PkeyAccessors.cpp) - the console bodies are unverified. assign stores the type and native key pointer in the 24-byte `EVP_PKEY`; replacing a non-null native key or method throws through `NotImplemented_nid_no_patch` because the type-specific destructor is not modelled. `EVP_PKEY_set1_EC_KEY` assigns the EC key and takes a reference; a null key returns 0. `EVP_PKEY_get1_RSA` returns the RSA key with a reference, queues `EVP_R_EXPECTING_AN_RSA_KEY` and returns null for another key type, and throws for a null key or a null RSA. Closes when: compared with the console.
 - [libtls context and configuration lifecycle](../../../core/libs/prx/libSceLibreSsl3/src/LibTls.cpp) - Ten exports implement only preconnection lifecycle and configuration. TLS handshake, read/write, certificate validation and encrypted transport still throw; callers cannot establish TLS sessions. No PS5 native ABI or error strings have been measured. Signatures and config ownership follow the [LibreSSL libtls API](https://man.openbsd.org/tls_init.3) and [source](https://github.com/libressl/openbsd/tree/master/src/lib/libtls): independent config allocation, refcounts held by client/server contexts, copied key memory zeroized on replacement/free, error pointers and fresh-context close/configure behavior. A server without a certificate fails. Future transport must consume the retained config and implement certificate/SSL context state.
 
 - [libtls CA memory and verification settings](../../../core/libs/prx/libSceLibreSsl3/src/LibTls.cpp) - Four additional exports copy owned CA bytes, assign a protocol bitmask, and set client-certificate and hostname-verification flags. They follow [OpenBSD libtls `tls_config.c`](https://github.com/openbsd/src/blob/master/lib/libtls/tls_config.c). TLS transport, certificate parsing and cipher-list validation remain unimplemented; `tls_config_set_cert_mem` and `tls_config_set_ciphers` still throw; `tls_config_parse_protocols` is implemented in `TlsProtocols.cpp`. Native PS5 ABI and option interoperability are unverified.
@@ -159,7 +160,6 @@
 | `d2i_X509_CRL` | `fVos2kAqfMI` |
 | `tls_write` | `fZJr2OF+KGw` |
 | `PEM_read_bio_PUBKEY` | `gn7mRF71J4k` |
-| `EVP_PKEY_assign` | `gp5dGS14-pI` |
 | `i2d_PKCS8_PRIV_KEY_INFO` | `iFlkTGEbE9k` |
 | `X509_CRL_get_ext_d2i` | `je-ydGAbgFg` |
 | `X509_digest` | `k1AHUWet-oU` |
