@@ -92,6 +92,7 @@ void DisplayWindow::updateAspectRatio(std::uint32_t sourceWidth, std::uint32_t s
 
 void DisplayWindow::Destroy() noexcept {
     if (window == nullptr) return;
+    keepAwake.Release();
     removeSubclass();
     SDL_DestroyWindow(window);
     window = nullptr;
