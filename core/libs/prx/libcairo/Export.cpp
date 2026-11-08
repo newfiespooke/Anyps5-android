@@ -384,10 +384,6 @@ int APS5_VABI cairo_device_to_user() {
     NotImplemented_nid_no_patch(__func__);
 }
 
-int APS5_VABI cairo_glyph_free() {
-    NotImplemented_nid_no_patch(__func__);
-}
-
 int APS5_VABI cairo_select_font_face() {
     NotImplemented_nid_no_patch(__func__);
 }
