@@ -62,6 +62,7 @@ struct PathAliases {
     std::vector<std::pair<std::string, std::string>> entries;
     std::vector<std::string> blocked;
     std::vector<std::pair<std::string, PathProvider>> providers;
+    std::atomic<std::uint64_t> generation{0};
 };
 
 PathAliases& Aliases() {
@@ -709,6 +710,7 @@ extern "C" void AddPathAlias_nid_no_patch(const char* guestPrefix, const char* h
     }
     auto& aliases = Aliases();
     std::lock_guard lock(aliases.mutex);
+    aliases.generation.fetch_add(1, std::memory_order_release);
     const auto prefix = TrimSlashes(guestPrefix);
     std::erase_if(aliases.blocked, [&](const auto& entry) { return SameName(entry, prefix); });
     for (auto& entry : aliases.entries) {
@@ -728,6 +730,7 @@ extern "C" void AddPathProvider_nid_no_patch(const char* guestPath, PathProvider
     if (path.empty()) { APS5_INVALID_ARG_EX; }
     auto& aliases = Aliases();
     std::lock_guard lock(aliases.mutex);
+    aliases.generation.fetch_add(1, std::memory_order_release);
     for (auto& entry : aliases.providers) {
         if (SameName(entry.first, path)) {
             entry.second = provide;
@@ -743,8 +746,13 @@ extern "C" void RemovePathAlias_nid_no_patch(const char* guestPrefix) {
     }
     auto& aliases = Aliases();
     std::lock_guard lock(aliases.mutex);
+    aliases.generation.fetch_add(1, std::memory_order_release);
     const auto prefix = TrimSlashes(guestPrefix);
     std::erase_if(aliases.entries, [&](const auto& entry) { return SameName(entry.first, prefix); });
+}
+
+extern "C" std::uint64_t PathAliasGeneration_nid_no_patch() {
+    return Aliases().generation.load(std::memory_order_acquire);
 }
 
 extern "C" void RecordWrittenPath_nid_no_patch(const std::filesystem::path& path) {
@@ -802,6 +810,7 @@ extern "C" void BlockPathAlias_nid_no_patch(const char* guestPrefix) {
     if (prefix.empty()) { APS5_INVALID_ARG_EX; }
     auto& aliases = Aliases();
     std::lock_guard lock(aliases.mutex);
+    aliases.generation.fetch_add(1, std::memory_order_release);
     std::erase_if(aliases.entries, [&](const auto& entry) { return SameName(entry.first, prefix); });
     std::erase_if(aliases.blocked, [&](const auto& entry) { return SameName(entry, prefix); });
     aliases.blocked.push_back(prefix);
