@@ -83,7 +83,6 @@
 | `unknown` | `3KZ-L4y1gak` |
 | `EVP_chacha20_poly1305` | `3m4CmAyOXwQ` |
 | `BIO_clear_flags` | `3sypCuBDdQs` |
-| `EVP_chacha20` | `3tGgkjBQ82A` |
 | `X509_set_pubkey` | `409ieWBMPUk` |
 | `BIO_get_shutdown` | `44M+SEbpNdQ` |
 | `tls_accept_socket` | `4Q3bvOy4LY8` |
