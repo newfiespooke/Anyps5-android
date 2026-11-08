@@ -254,4 +254,22 @@ public:
     bool isVisible = false;
 };
 
+class ResourceCacheManager final : public ObjectOf<ObjectType::CacheManager> {
+public:
+    std::uint32_t lastCachesCleared = 0;
+    bool clearedAll = false;
+    std::vector<std::string> origins;
+
+    void ClearAll(std::uint32_t cachesToClear) {
+        lastCachesCleared = cachesToClear;
+        clearedAll = true;
+        origins.clear();
+    }
+
+    void ClearForOrigin(const std::string& origin, std::uint32_t cachesToClear) {
+        lastCachesCleared = cachesToClear;
+        std::erase(origins, origin);
+    }
+};
+
 }  // namespace NKWebKit
