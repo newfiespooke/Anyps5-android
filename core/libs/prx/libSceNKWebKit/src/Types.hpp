@@ -254,4 +254,12 @@ public:
     bool isVisible = false;
 };
 
+class Image final : public ObjectOf<ObjectType::Image> {
+public:
+    explicit Image(int width, int height) : width(width), height(height) {}
+
+    int width = 0;
+    int height = 0;
+};
+
 }  // namespace NKWebKit
