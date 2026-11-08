@@ -244,8 +244,16 @@ function(add_shader_recompiler target runtimeTarget)
     endif()
     set(shaderCacheReviewedNames
             BdaAbi::RangesOrdered
+            RuntimeAbi::GpuHeapStorageKind
+            RuntimeAbi::StageGroup
+            StagePushFeatures
+            RuntimeAbi::UintStorageImageKind
+            StorageElementPointer
+            FirstAtomicStorageImageBinding
             BuildBarycentricGeometryShader
             BuildBarycentricTessellationShaders
+            CompleteHeapDataWords
+            HeapTemplateCounts
             BuildPreparedShaderKey
             BuildRectListShaders
             BuildTessellationCaptureGeometryShader
@@ -267,6 +275,9 @@ function(add_shader_recompiler target runtimeTarget)
             PipelineSpecialization::WorkgroupOffsetWords
             PixelInput
             PixelInputBit
+            PlacePushData
+            PushBytesMask
+            PushPartOf
             RayTracingStrict
             RayTracingMiss
             ReadWholeFile
