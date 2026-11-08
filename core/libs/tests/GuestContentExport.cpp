@@ -1,5 +1,6 @@
 #include "prx/libSceContentExport/include/Api.hpp"
 #include "SceTypes.hpp"
+#include <cerrno>
 #include <cstdint>
 #include <cstdlib>
 #include <set>
@@ -66,6 +67,9 @@ void ExportFileWithTitleIdList(std::int32_t expId) {
 int main() {
     ContentExportInitParam2 param{&allocator, &allocator, nullptr, 0x10000, 0, 0};
     Require(Throws([] { sceContentExportInit2(nullptr); }));
+    errno = 71;
+    Require(Throws([] { sceContentExportInit2(reinterpret_cast<const ContentExportInitParam2*>(0x10)); }));
+    Require(errno == 71);
     Require(sceContentExportTerm() == static_cast<int>(0x809D3004u));
     Require(sceContentExportStart() == static_cast<int>(0x809D3004u));
     Require(Throws([] { sceContentExportFinish(1); }));
