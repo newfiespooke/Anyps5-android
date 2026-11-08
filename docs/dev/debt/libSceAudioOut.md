@@ -78,6 +78,7 @@
 - [sceAudioOutMasteringTerm](../../../core/libs/prx/libSceAudioOut/src/AudioOut2Mastering.cpp) (libSceAudioOut) - returns 0 without doing anything: there is no mastering stage to tear down, and `sceAudioOutMasteringInit` keeps no state. Whether the console fails a Term without a matching Init is unknown
 - [sceAudioOutSetMainOutput](../../../core/libs/prx/libSceAudioOut/src/AudioOut.cpp) (libSceAudioOut) - returns 0 and does nothing, as the console function does on firmware 12.70: [PS5-Audio-Passthrough-Research](https://github.com/sainsaji/PS5-Audio-Passthrough-Research/blob/cf3c921d79bf00db4847f31b68a7bd95a8037cd7/docs/FINDINGS.md#L25) reads that export as `xor eax,eax; ret`. The export reads no argument, so its parameters stay unknown; other firmware versions are unverified
 - [sceAudioOut2ContextSetAttributes](../../../core/libs/prx/libSceAudioOut/src/AudioOut2Context.cpp) (libSceAudioOut) - for a valid context and attribute list, returns 0 and ignores every attribute (an invalid context gives `INVALID_HANDLE`, a null list with a nonzero count `INVALID_ARGUMENT`); what a context attribute changes on a console is unknown. PPSA25286 01.000.568 sets attribute 2 to a 4-byte 1 at start-up, and PPSA02225 passes two attributes from an object at its single call.
+- [sceAudioOutSetSystemDebugState](../../../core/libs/prx/libSceAudioOut/src/Unimplemented.cpp) (libSceAudioOut) - the host has no system mix; the export throws through `NotImplemented_nid_no_patch`. The parameterless pending export is not measured on a console.
 
 ### Unknown function info
 
@@ -135,7 +136,6 @@
 - [sceAudioOut2LoPortSetAttributesEx](../../../core/libs/prx/libSceAudioOut/src/AudioOut2Port.cpp) (libSceAudioOut) - the PS5 4.03 module takes the same three arguments as `sceAudioOut2LoPortSetAttributes` and passes an internal flag into the shared core, which widens the writable attribute-id mask (`0x200000603` vs `0x603`). The host forwards to `sceAudioOut2PortSetAttributes`; the extra writable id's semantics are unverified.
 - [sceAudioOut2PortSetAttributesEx, sceAudioOut2LoPortGetStateEx and sceAudioOut2GetAmbisonicsEncodeCoefficients](../../../core/libs/prx/libSceAudioOut/src/Unimplemented.cpp) (libSceAudioOut) - absent from the PS5 4.03 module's export table (later-firmware additions); signatures and behavior remain unverified and the exports still throw through `NotImplemented_nid_no_patch`.
 - [sceAudioOutOpenEx](../../../core/libs/prx/libSceAudioOut/src/Unimplemented.cpp) (libSceAudioOut) - unknown signature
-- [sceAudioOutSetSystemDebugState](../../../core/libs/prx/libSceAudioOut/src/Unimplemented.cpp) (libSceAudioOut) - unknown signature
 - [sceAudioOutGetHandleStatusInfo](../../../core/libs/prx/libSceAudioOut/src/Unimplemented.cpp) (libSceAudioOut) - unknown signature
 - [sceAudioOutGetSimulatedHandleStatusInfo2](../../../core/libs/prx/libSceAudioOut/src/Unimplemented.cpp) (libSceAudioOut) - unknown signature
 - [sceAudioOutChangeAppModuleState](../../../core/libs/prx/libSceAudioOut/src/Unimplemented.cpp) (libSceAudioOut) - unknown signature
