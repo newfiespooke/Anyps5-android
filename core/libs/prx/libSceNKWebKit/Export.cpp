@@ -23697,10 +23697,6 @@ int APS5_VABI _ZN7WebCore22EmptyFrameLoaderClient31dispatchDidDispatchOnloadEven
     NotImplemented_nid_no_patch(__func__);
 }
 
-int APS5_VABI _ZN7WebCore22EmptyFrameLoaderClient31dispatchDidReachLayoutMilestoneEN3WTF9OptionSetINS_15LayoutMilestoneEEE() {
-    NotImplemented_nid_no_patch(__func__);
-}
-
 int APS5_VABI _ZN7WebCore22EmptyFrameLoaderClient31dispatchDidStartProvisionalLoadEv() {
     NotImplemented_nid_no_patch(__func__);
 }
