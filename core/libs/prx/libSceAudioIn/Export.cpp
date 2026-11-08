@@ -276,7 +276,6 @@ int APS5_VABI sceAudioInIsSharedDevice(int handle) {
         if (!g_ports[index].used) return AUDIO_IN_ERROR_INVALID_STATE;
     }
     NotImplemented_nid_no_patch(__func__);
-    return 0;
 }
 
 int APS5_VABI sceAudioInDeviceIdHqOpen(int userId, std::uint32_t type, std::uint32_t deviceId, std::uint32_t len, std::uint32_t freq, std::uint32_t param) {
