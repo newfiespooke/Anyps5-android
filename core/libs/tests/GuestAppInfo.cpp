@@ -99,6 +99,16 @@ int main(int argc, char** argv) {
     std::memset(expected + 0x50, 0xff, 4);
     Require(std::memcmp(wide, expected, sizeof(wide)) == 0);
     Require(sceKernelGetAppInfo(self, nullptr) == 0);
+    Require(sceKernelGetAppInfo(0, nullptr) == 0);
+    for (int foreignPid : {-1, self + 1, self + 100}) {
+        bool threw = false;
+        try {
+            (void)sceKernelGetAppInfo(foreignPid, nullptr);
+        } catch (const std::runtime_error& error) {
+            threw = std::string_view(error.what()).find("sceKernelGetAppInfo: a pid other than the caller's and 0") != std::string_view::npos;
+        }
+        Require(threw);
+    }
     errno = 71;
     Require(sceKernelGetAppInfo(self, reinterpret_cast<void*>(0x10)) == SCE_KERNEL_ERROR_EFAULT);
     Require(errno == 71);
