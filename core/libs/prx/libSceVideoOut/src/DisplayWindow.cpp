@@ -82,6 +82,7 @@ void DisplayWindow::create(std::uint32_t sourceWidth, std::uint32_t sourceHeight
     SDL_SetWindowMinimumSize(window, static_cast<int>(DisplayWindowMinimumWidth), static_cast<int>(DisplayWindowMinimumHeight));
     applyAppIcon(window);
     installSubclass();
+    if (KeepAwakeEnabled()) keepAwake.Acquire();
 }
 
 void DisplayWindow::updateAspectRatio(std::uint32_t sourceWidth, std::uint32_t sourceHeight) {
@@ -91,6 +92,7 @@ void DisplayWindow::updateAspectRatio(std::uint32_t sourceWidth, std::uint32_t s
 
 void DisplayWindow::Destroy() noexcept {
     if (window == nullptr) return;
+    keepAwake.Release();
     removeSubclass();
     SDL_DestroyWindow(window);
     window = nullptr;
