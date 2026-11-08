@@ -3,6 +3,7 @@
 #include "prx/libSceSaveDataDialog.native/SaveDataDialog.hpp"
 #include "prx/libc/include/general/VabiMacros.hpp"
 
+#include <cerrno>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -39,6 +40,9 @@ int main() {
     Require(sceSaveDataDialogInitialize() == 0, "initialize");
     Require(sceSaveDataDialogInitialize() == SAVE_DATA_DIALOG_ERROR_ALREADY_INITIALIZED, "double init");
     Require(sceSaveDataDialogOpen(nullptr) == SAVE_DATA_DIALOG_ERROR_ARG_NULL, "open with null param");
+    errno = 71;
+    Require(sceSaveDataDialogOpen(reinterpret_cast<const void*>(0x10)) == SAVE_DATA_DIALOG_ERROR_ARG_NULL, "open with unmapped param");
+    Require(errno == 71, "open preserved errno");
     Require(sceSaveDataDialogClose(nullptr) == SAVE_DATA_DIALOG_ERROR_NOT_RUNNING, "close while initialized not running");
     Require(sceSaveDataDialogGetResult(&uninitResult) == SAVE_DATA_DIALOG_ERROR_NOT_FINISHED, "get result before open");
     Require(sceSaveDataDialogProgressBarInc(0, 10) == SAVE_DATA_DIALOG_ERROR_NOT_RUNNING, "progress inc while initialized not running");
@@ -82,8 +86,10 @@ int main() {
         Require(sceSaveDataDialogGetResult(&result) == 0, "read completed result");
         Require(sceSaveDataDialogGetResult(nullptr) == SAVE_DATA_DIALOG_ERROR_ARG_NULL,
                 "get result with null result pointer");
+        errno = 71;
         Require(sceSaveDataDialogGetResult(reinterpret_cast<SaveDataDialogResult*>(0x10)) == SAVE_DATA_DIALOG_ERROR_ARG_NULL,
                 "get result with invalid pointer");
+        Require(errno == 71, "get result preserved errno");
         SaveDataDialogResult invalidDirResult{};
         invalidDirResult.dir_name = reinterpret_cast<void*>(0x10);
         Require(sceSaveDataDialogGetResult(&invalidDirResult) == SAVE_DATA_DIALOG_ERROR_ARG_NULL,
