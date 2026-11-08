@@ -246,4 +246,8 @@ std::uint32_t APS5_VABI WKWebsiteDataStoreGetTypeID();
 std::uint32_t APS5_VABI WKWebsitePoliciesGetTypeID();
 std::uint32_t APS5_VABI WKWindowFeaturesGetTypeID();
 
+APS5_VABI bool WKNavigationActionShouldPerformDownload(const void* navigationActionRef);
+APS5_VABI const void* WKNavigationDataCopyOriginalRequest(const void* navigationDataRef);
+APS5_VABI bool WKNavigationResponseCanShowMIMEType(const void* navigationResponseRef);
+
 }
