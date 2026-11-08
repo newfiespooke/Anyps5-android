@@ -42,6 +42,10 @@ void* AcquireRendererSelection(RendererNative* renderer) {
     }
 }
 
+std::atomic<std::uint32_t> glyphSupportLock;
+const FontGlyphSupport* glyphSupportSlots[2];
+std::uint32_t glyphSupportCount;
+
 void* CreateFontContext(FontLibNative* library, std::uint32_t entries, std::uint32_t size) {
     void* ctx = library->iface->alloc(library->alloc_ctx, size);
     if (!ctx) return nullptr;
@@ -83,6 +87,31 @@ int SupportFonts(FontLibrary library, void* FontLibNative::*slot, std::uint32_t 
 #pragma GCC visibility push(default)
 
 extern "C" {
+
+int APS5_VABI sceFontSupportGlyphs(const FontGlyphSupport* support) {
+    const auto* tags = reinterpret_cast<const std::uint16_t*>(support);
+    if (!tags || tags[0] != 0x0F1F) return SCE_FONT_ERROR_INVALID_PARAMETER;
+    if (tags[2] != 0x0F03) return SCE_FONT_ERROR_FATAL;
+    for (;;) {
+        std::uint32_t current = glyphSupportLock.load(std::memory_order_acquire);
+        if (current != 0 || !glyphSupportLock.compare_exchange_weak(current, LOCK_BIT, std::memory_order_acq_rel)) {
+            Backoff();
+            continue;
+        }
+        break;
+    }
+    for (auto& slot : glyphSupportSlots) {
+        if (slot == support) return SCE_FONT_OK;
+        if (!slot) {
+            slot = support;
+            ++glyphSupportCount;
+            glyphSupportLock.store(0, std::memory_order_release);
+            return SCE_FONT_OK;
+        }
+    }
+    glyphSupportLock.store(0, std::memory_order_release);
+    return SCE_FONT_OK;
+}
 
 int APS5_VABI sceFontSupportSystemUpdation(FontLibrary library, std::uint32_t version) {
     auto* lib = static_cast<FontLibNative*>(library);
