@@ -11,6 +11,7 @@
 #include <cstdint>
 #include <condition_variable>
 #include <cstring>
+#include <cerrno>
 #include <mutex>
 #include <memory>
 #include <stdexcept>
@@ -186,16 +187,43 @@ extern "C" {
 
 std::int32_t APS5_VABI sceAudioPropagationSystemQueryMemory(const SystemOptions* options, AudioPropagationSystemMemory* outMemory) {
     if (!options || !outMemory) return ErrorNullPointer;
-    if (outMemory->desc.id != SystemMemoryId || outMemory->desc.size != SystemMemorySize) return static_cast<std::int32_t>(0x8A700007);
-    outMemory->p_cpu_mem = nullptr;
-    outMemory->size_cpu_mem = 0;
-    outMemory->p_gpu_mem = nullptr;
-    outMemory->size_gpu_mem = 0;
-    if (options->desc.id != SystemOptionsId || options->desc.size != SystemOptionsSize) return static_cast<std::int32_t>(0x8A700007);
-    if (options->maxSources == 0 || options->maxSources > 64 || options->maxMaterials == 0 || options->maxMaterials > 64 || options->parameter24 != 6 || options->reflectionOrder == 0 || options->reflectionOrder > 2) return ErrorInvalidArgument;
+    AudioPropagationSystemMemory localMemory{};
+    const int savedErrno = errno;
+    const bool copiedIn = GuestCopyIn_nid_no_patch(&localMemory, outMemory, sizeof(localMemory));
+    if (!copiedIn) {
+        errno = savedErrno;
+        return ErrorNullPointer;
+    }
+    if (localMemory.desc.id != SystemMemoryId || localMemory.desc.size != SystemMemorySize) {
+        errno = savedErrno;
+        return static_cast<std::int32_t>(0x8A700007);
+    }
+    localMemory.p_cpu_mem = nullptr;
+    localMemory.size_cpu_mem = 0;
+    localMemory.p_gpu_mem = nullptr;
+    localMemory.size_gpu_mem = 0;
+    const bool cleared = GuestCopyOut_nid_no_patch(outMemory, &localMemory, sizeof(localMemory));
+    if (!cleared) {
+        errno = savedErrno;
+        return ErrorNullPointer;
+    }
+    if (options->desc.id != SystemOptionsId || options->desc.size != SystemOptionsSize) {
+        errno = savedErrno;
+        return static_cast<std::int32_t>(0x8A700007);
+    }
+    if (options->maxSources == 0 || options->maxSources > 64 || options->maxMaterials == 0 || options->maxMaterials > 64 || options->parameter24 != 6 || options->reflectionOrder == 0 || options->reflectionOrder > 2) {
+        errno = savedErrno;
+        return ErrorInvalidArgument;
+    }
     const auto frameSamples = options->frameSamples;
-    if (frameSamples != 256 && frameSamples != 512 && frameSamples != 1024 && frameSamples != 2048 && frameSamples != 4096) return ErrorInvalidArgument;
-    if (!(options->propagationSpeed > 0x1p-23f) || options->propagationSpeed > 1372.0f || !(options->maxPathLength > 0x1p-23f) || options->maxPathLength > 1372.0f || options->flags > 31 || ((options->flags & 1) && frameSamples != 512)) return ErrorInvalidArgument;
+    if (frameSamples != 256 && frameSamples != 512 && frameSamples != 1024 && frameSamples != 2048 && frameSamples != 4096) {
+        errno = savedErrno;
+        return ErrorInvalidArgument;
+    }
+    if (!(options->propagationSpeed > 0x1p-23f) || options->propagationSpeed > 1372.0f || !(options->maxPathLength > 0x1p-23f) || options->maxPathLength > 1372.0f || options->flags > 31 || ((options->flags & 1) && frameSamples != 512)) {
+        errno = savedErrno;
+        return ErrorInvalidArgument;
+    }
     if (options->flags & 1) throw std::runtime_error(std::string(__func__) + ": GPU memory requirements depend on an unsupported native runtime query");
     const std::uint64_t sources = options->maxSources;
     const std::uint64_t paths = sources * (options->reflectionOrder == 1 ? 6 : 36);
@@ -211,7 +239,13 @@ std::int32_t APS5_VABI sceAudioPropagationSystemQueryMemory(const SystemOptions*
     if (options->flags & 4) bytes += 2000656;
     if (options->flags & 8) bytes += 288 * paths;
     if (options->flags & 16) bytes += 144 * paths;
-    outMemory->size_cpu_mem = bytes + 5368 - ((bytes & 15) ^ 8);
+    localMemory.p_cpu_mem = nullptr;
+    localMemory.size_cpu_mem = bytes + 5368 - ((bytes & 15) ^ 8);
+    localMemory.p_gpu_mem = nullptr;
+    localMemory.size_gpu_mem = 0;
+    const bool copiedOut = GuestCopyOut_nid_no_patch(outMemory, &localMemory, sizeof(localMemory));
+    errno = savedErrno;
+    if (!copiedOut) return ErrorNullPointer;
     return 0;
 }
 
