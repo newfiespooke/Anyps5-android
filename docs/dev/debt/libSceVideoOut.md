@@ -298,3 +298,7 @@
 | `Unknown` | `IkyDS23qu4g` |
 | `Unknown` | `gQwfLPPIZQ8` |
 | `Unknown` | `rJmjlPlreu4` |
+
+### Host input mapping gaps
+
+- [InputMapping](../../../core/libs/prx/libSceVideoOut/src/InputMapping.cpp) - the file watch compares modification time and size, so a rewrite that keeps both is not seen; the stamp is taken when the watch thread starts, so a change made between the initial load and that start is not reloaded until the next change.
