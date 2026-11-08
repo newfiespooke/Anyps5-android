@@ -11855,6 +11855,81 @@ void verifyTableKeep() {
     }
 }
 
+void verifyTableKeepCompare() {
+    using namespace ShaderRecompiler;
+    std::vector<std::uint32_t> code{0xf40c0200u, 0xfa000000u, 0xf4080500u, 0xfa000020u, 0xf4080600u, 0xfa000040u, 0xf4000400u, 0xfa000050u, 0xf4080a00u, 0xfa000080u, 0xbf8cc07fu, 0xf42c0814u, 0xfa000000u, 0xbf8cc07fu, 0xbf068010u, 0xbf850008u};
+    for (std::uint32_t dword = 0; dword < 8u; dword++) {
+        code.push_back(0xbe800300u | ((8u + dword) << 16u) | (32u + dword));
+    }
+    code.insert(code.end(), {0xf09c0f08u, 0x00a20000u, 0xbf8c3f70u, 0xe0700000u, 0x80060000u, 0xbf810000u});
+    constexpr std::uint32_t Format8888UNorm = 56;
+    constexpr std::uint32_t Type2D = 9;
+    struct alignas(256) Texture { std::array<std::uint8_t, 256> bytes{}; };
+    static Texture textures[2];
+    const auto makeImage = [&](const Texture& texture, std::uint32_t extent) {
+        const auto base = static_cast<std::uint64_t>(reinterpret_cast<std::uintptr_t>(texture.bytes.data()));
+        return std::array<std::uint32_t, 8>{static_cast<std::uint32_t>(base >> 8u), static_cast<std::uint32_t>((base >> 40u) & 0xffu) | (Format8888UNorm << 20u) | (extent << 30u), extent << 14u, 0xfacu | (Type2D << 28u), 0u, 0u, 0u, 0u};
+    };
+    const auto oldT = makeImage(textures[0], 3u);
+    const auto newT = makeImage(textures[1], 7u);
+    std::array<std::uint32_t, 4> output{};
+    const auto outputAddress = static_cast<std::uint64_t>(reinterpret_cast<std::uintptr_t>(output.data()));
+    alignas(4096) static std::array<std::uint32_t, 1024> srt{};
+    static const auto srtAddress = static_cast<std::uint64_t>(reinterpret_cast<std::uintptr_t>(srt.data()));
+    const std::array<std::uint32_t, 4> outputV{static_cast<std::uint32_t>(outputAddress), static_cast<std::uint32_t>((outputAddress >> 32u) & 0xffffu), 16u, 0xfacu};
+    const std::array<std::uint32_t, 2> userData{static_cast<std::uint32_t>(srtAddress), static_cast<std::uint32_t>(srtAddress >> 32u)};
+    const std::array<std::uint32_t, 4> capabilities{29u, spv::CapabilityInt64, spv::CapabilityPhysicalStorageBufferAddresses, spv::CapabilityStorageBuffer8BitAccess};
+    const std::array<std::string_view, 2> extensions{"SPV_KHR_physical_storage_buffer", "SPV_KHR_8bit_storage"};
+    RecompileRequest request{};
+    request.shader = {ShaderStage::Compute, 0x23001u, code, 0, {}};
+    request.context.waveSize = 32u;
+    request.context.userDataBaseRegister = 0;
+    request.context.userData = userData;
+    request.context.compute = ShaderComputeStageInfo{{32u, 1u, 1u}, 0u, {false, false, false}, false, 1u};
+    request.target.vulkanVersion = 0x00401000u;
+    request.target.spirvVersion = 0x00010300u;
+    request.target.subgroupSize = 32;
+    request.target.supportedCapabilities = capabilities;
+    request.target.supportedExtensions = extensions;
+    request.target.bdaAbiVersion = BdaAbi::Version;
+    request.target.fragmentShaderBarycentricEnabled = false;
+    request.layout.pushConstantSizeBytes = 128;
+    const auto pendingSpan = +[](std::uint64_t, std::size_t, std::span<std::byte>) -> AgcDriver::ShaderMemory::PendingWrite {
+        return AgcDriver::ShaderMemory::PendingWrite::None;
+    };
+    srt.fill(0u);
+    std::copy(oldT.begin(), oldT.end(), srt.begin());
+    std::copy(outputV.begin(), outputV.end(), srt.begin() + 16);
+    srt[20] = 1u;
+    AgcDriver::ShaderMemory memory({}, nullptr, nullptr, nullptr, pendingSpan);
+    require(memory.KeepTable(srtAddress), "table keep compare: a table with no GPU write over it was not kept");
+    std::copy(newT.begin(), newT.end(), srt.begin());
+    static_cast<void>(memory.Capture(request));
+    const auto regions = memory.Regions();
+    const auto kept = memory.KeptRanges();
+    require(kept.size() == 1u && kept.front().first == srtAddress && kept.front().second == srtAddress + AgcDriver::ShaderMemory::KeepBytes, "table keep compare: the kept range is not the kept block");
+    const bool cacheSeesChange = std::ranges::any_of(regions, [](const MemoryRegion& region) {
+        return AgcDriver::GuestMemory::CompareMapped(region.guestAddress, region.bytes) == AgcDriver::GuestMemory::Compare::Differs;
+    });
+    require(cacheSeesChange, "table keep compare: the kept words compare equal to the changed memory, so a cached draw would be reused for other words");
+    const bool commitSeesChange = std::ranges::any_of(regions, [&](const MemoryRegion& region) {
+        return AgcDriver::ShaderMemory::CompareOutsideKept(region, kept) == AgcDriver::GuestMemory::Compare::Differs;
+    });
+    require(!commitSeesChange, "table keep compare: the commit-time check counts the kept words as changed memory and would capture the draw again");
+
+    std::array<std::uint32_t, 16> beside{};
+    std::copy_n(srt.begin() + 56, beside.size(), beside.begin());
+    const MemoryRegion straddling{srtAddress + 56u * sizeof(std::uint32_t), std::as_bytes(std::span(beside))};
+    srt[60] ^= 1u;
+    require(AgcDriver::ShaderMemory::CompareOutsideKept(straddling, kept) != AgcDriver::GuestMemory::Compare::Differs, "table keep compare: a change inside the kept block counted for a region that reaches past it");
+    srt[70] ^= 1u;
+    require(AgcDriver::ShaderMemory::CompareOutsideKept(straddling, kept) == AgcDriver::GuestMemory::Compare::Differs, "table keep compare: a change past the kept block did not count");
+    require(AgcDriver::ShaderMemory::CompareOutsideKept(straddling, {}) == AgcDriver::GuestMemory::Compare::Differs, "table keep compare: without a keep the changed region compared equal");
+    srt[60] ^= 1u;
+    srt[70] ^= 1u;
+    require(AgcDriver::ShaderMemory::CompareOutsideKept(straddling, kept) == AgcDriver::GuestMemory::Compare::Unmapped, "table keep compare: a region that overlaps a keep was reported as compared whole");
+}
+
 int main(int argc, char** argv) {
     try {
 #ifdef _WIN32
@@ -11863,6 +11938,11 @@ int main(int argc, char** argv) {
         setenv("ANYPS5_NO_SHADER_CACHE", "1", 1);
 #endif
         using namespace ShaderRecompiler;
+        if (argc == 2 && std::string_view(argv[1]) == "--table-keep-compare") {
+            verifyTableKeepCompare();
+            std::cout << "Kept words differ from changed memory for the draw cache and not for the commit-time change check\n";
+            return 0;
+        }
         if (argc == 2 && std::string_view(argv[1]) == "--table-keep") {
             verifyTableKeep();
             std::cout << "A kept table is read as it was at the draw packet and listed with the capture's regions\n";

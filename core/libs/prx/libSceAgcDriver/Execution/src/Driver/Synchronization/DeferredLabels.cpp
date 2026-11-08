@@ -208,11 +208,11 @@ void Driver::runCaptureCheckHook() {
     if (const auto hook = captureCheckHook.load(std::memory_order_acquire)) hook();
 }
 
-bool Driver::capturedMemoryChanged(std::span<const ShaderRecompiler::MemoryRegion> regions, std::span<Graphics::GuestMemorySnapshot> compared) {
+bool Driver::capturedMemoryChanged(std::span<const ShaderRecompiler::MemoryRegion> regions, std::span<Graphics::GuestMemorySnapshot> compared, std::span<const std::pair<std::uint64_t, std::uint64_t>> kept) {
     if (recapturing()) return false;
     const bool mark = compared.size() == regions.size();
     for (std::size_t i = 0; i < regions.size(); ++i) {
-        const auto outcome = GuestMemory::CompareMapped(regions[i].guestAddress, regions[i].bytes);
+        const auto outcome = ShaderMemory::CompareOutsideKept(regions[i], kept);
         if (outcome == GuestMemory::Compare::Differs) return true;
         if (mark && outcome == GuestMemory::Compare::Equal) compared[i].compared = true;
     }

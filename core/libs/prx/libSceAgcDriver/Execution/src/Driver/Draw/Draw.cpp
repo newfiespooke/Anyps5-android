@@ -244,6 +244,10 @@ bool DrawTableSnapshotEnabled() {
     return Graphics::RuntimeSwitches::Set(Graphics::RuntimeSwitch::TableSnapshot);
 }
 
+std::span<const std::pair<std::uint64_t, std::uint64_t>> keptTables(const std::unique_ptr<ShaderMemory>& memory) {
+    return memory != nullptr ? memory->KeptRanges() : std::span<const std::pair<std::uint64_t, std::uint64_t>>{};
+}
+
 void KeepUserDataTables(ShaderMemory& memory, const std::vector<DrawProgram>& programs) {
     for (const auto& program : programs) {
         const std::span<const std::uint32_t> userData = program.userData;
@@ -1209,7 +1213,7 @@ DrawVerdict Driver::finishDraw(DrawTail& tail, PerformanceTimer& timing) {
             }
             if (pipelined && pipelinedIndirect && record == lastDrawable && !gpuLock.owns_lock() && deferredLabels().labels.empty()) {
                 runCaptureCheckHook();
-                if (tail.queue != nullptr && capturedMemoryChanged(memory)) {
+                if (tail.queue != nullptr && capturedMemoryChanged(memory, {}, keptTables(shaderMemory))) {
                     const RecaptureScope recapture;
                     return draw(*tail.queue, tail.packet, submission, tail.packetOffset, rejected);
                 }
@@ -1233,7 +1237,7 @@ DrawVerdict Driver::finishDraw(DrawTail& tail, PerformanceTimer& timing) {
             lockForDraw();
             if (!recordedOne) {
                 runCaptureCheckHook();
-                if (tail.queue != nullptr && capturedMemoryChanged(memory, snapshots)) {
+                if (tail.queue != nullptr && capturedMemoryChanged(memory, snapshots, keptTables(shaderMemory))) {
                     gpuLock.unlock();
                     const RecaptureScope recapture;
                     return draw(*tail.queue, tail.packet, submission, tail.packetOffset, rejected);
@@ -1277,7 +1281,7 @@ DrawVerdict Driver::finishDraw(DrawTail& tail, PerformanceTimer& timing) {
     }
     if (pipelined && !drawParameters.indirect && (tail.queue == nullptr || deferredLabels().labels.empty())) {
         runCaptureCheckHook();
-        if (tail.queue != nullptr && capturedMemoryChanged(memory)) {
+        if (tail.queue != nullptr && capturedMemoryChanged(memory, {}, keptTables(shaderMemory))) {
             const RecaptureScope recapture;
             return draw(*tail.queue, tail.packet, submission, tail.packetOffset, rejected);
         }
@@ -1301,7 +1305,7 @@ DrawVerdict Driver::finishDraw(DrawTail& tail, PerformanceTimer& timing) {
     if (drawParameters.indirect) drainBeforeInline();
     lockForDraw();
     runCaptureCheckHook();
-    if (tail.queue != nullptr && capturedMemoryChanged(memory, snapshots)) {
+    if (tail.queue != nullptr && capturedMemoryChanged(memory, snapshots, keptTables(shaderMemory))) {
         gpuLock.unlock();
         const RecaptureScope recapture;
         return draw(*tail.queue, tail.packet, submission, tail.packetOffset, rejected);

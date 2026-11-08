@@ -548,6 +548,33 @@ bool ShaderMemory::KeepTable(std::uint64_t address) {
     return true;
 }
 
+GuestMemory::Compare ShaderMemory::CompareOutsideKept(const ShaderRecompiler::MemoryRegion& region, std::span<const std::pair<std::uint64_t, std::uint64_t>> kept) {
+    if (kept.empty()) return GuestMemory::CompareMapped(region.guestAddress, region.bytes);
+    const auto begin = region.guestAddress;
+    const auto end = begin + region.bytes.size();
+    std::vector<std::pair<std::uint64_t, std::uint64_t>> pieces{{begin, end}};
+    bool overlapped = false;
+    for (const auto& [from, to] : kept) {
+        if (to <= begin || from >= end) continue;
+        overlapped = true;
+        std::vector<std::pair<std::uint64_t, std::uint64_t>> next;
+        for (const auto& [pieceFrom, pieceTo] : pieces) {
+            if (to <= pieceFrom || from >= pieceTo) {
+                next.emplace_back(pieceFrom, pieceTo);
+                continue;
+            }
+            if (pieceFrom < from) next.emplace_back(pieceFrom, from);
+            if (to < pieceTo) next.emplace_back(to, pieceTo);
+        }
+        pieces = std::move(next);
+    }
+    if (!overlapped) return GuestMemory::CompareMapped(begin, region.bytes);
+    for (const auto& [from, to] : pieces) {
+        if (GuestMemory::CompareMapped(from, region.bytes.subspan(static_cast<std::size_t>(from - begin), static_cast<std::size_t>(to - from))) == GuestMemory::Compare::Differs) return GuestMemory::Compare::Differs;
+    }
+    return GuestMemory::Compare::Unmapped;
+}
+
 bool ShaderMemory::invalidateRawPages() {
     bool invalidated = false;
     for (auto& [pageBase, existing] : pages) {

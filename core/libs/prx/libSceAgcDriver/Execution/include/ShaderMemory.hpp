@@ -1,6 +1,7 @@
 #ifndef CORE_LIBS_PRX_LIBSCEAGCDRIVER_EXECUTION_INCLUDE_SHADERMEMORY_HPP
 #define CORE_LIBS_PRX_LIBSCEAGCDRIVER_EXECUTION_INCLUDE_SHADERMEMORY_HPP
 
+#include "prx/libSceAgcDriver/Execution/include/GuestMemory.hpp"
 #include "Recompiler.hpp"
 #include "IntermediateRepresentation/IrMetadata/ResourcePlan.hpp"
 #include <algorithm>
@@ -63,6 +64,8 @@ public:
     ~ShaderMemory();
     static constexpr std::size_t KeepBytes = 256;
     bool KeepTable(std::uint64_t address);
+    [[nodiscard]] std::span<const std::pair<std::uint64_t, std::uint64_t>> KeptRanges() const { return keptRanges; }
+    static GuestMemory::Compare CompareOutsideKept(const ShaderRecompiler::MemoryRegion& region, std::span<const std::pair<std::uint64_t, std::uint64_t>> kept);
     ShaderMemory(const ShaderMemory&) = delete;
     ShaderMemory& operator=(const ShaderMemory&) = delete;
     // Returns what the capture resolved (plan, snapshot, specialization) for
