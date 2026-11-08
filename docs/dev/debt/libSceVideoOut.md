@@ -298,3 +298,7 @@
 | `Unknown` | `IkyDS23qu4g` |
 | `Unknown` | `gQwfLPPIZQ8` |
 | `Unknown` | `rJmjlPlreu4` |
+
+### Host screen keep-awake
+
+- [Wayland](../../../core/libs/prx/libSceVideoOut/src/KeepAwake.cpp) - not verified. SDL 2.33.0 (bundled) suspends the screen saver on Wayland through the idle-inhibit protocol, one inhibitor per window surface, when the compositor offers it; no Wayland session was available here, so whether the screen stays awake under a given compositor is unmeasured.
