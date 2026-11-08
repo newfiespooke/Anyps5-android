@@ -9,3 +9,7 @@
 
 - [sceSaveDataDialogGetResult](../../../core/libs/prx/libSceSaveDataDialog.native/Export.cpp) (libSceSaveDataDialog.native) - returning `SAVE_DATA_DIALOG_ERROR_ARG_NULL` for a non-null unwritable result or directory name pointer is a host-safety fallback; console behaviour for unmapped memory is unmeasured. Closes when: measured on a PS5
 - [sceSaveDataDialogOpen](../../../core/libs/prx/libSceSaveDataDialog.native/Export.cpp) (libSceSaveDataDialog.native) - no overlay dialog is drawn for any mode: the layouts of the user message, system message and error code parameters that the `SaveDataDialogParam` pointers lead to have no source in this repository or measurement on a PS5, so a dialog is not built from them. Closes when: the parameter layouts are measured on a PS5
+
+### Functional
+
+- [sceSaveDataDialogOpen](../../../core/libs/prx/libSceSaveDataDialog.native/Export.cpp) (libSceSaveDataDialog.native) - returning SAVE_DATA_DIALOG_ERROR_ARG_NULL (0x80B8000D) for unmapped or unreadable parameter pointers is a host-safety fallback; whether console hardware faults or returns an argument error on unmapped memory is unmeasured.
