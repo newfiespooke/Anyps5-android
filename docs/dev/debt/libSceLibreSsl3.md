@@ -72,7 +72,7 @@
 
 ### Additional callable export inventory
 
-- [Additional exports](../../../core/libs/prx/libSceLibreSsl3/AdditionalExports.cpp) declare 111 still-unimplemented callable exports: 102 named and 9 known only by NID. These entries throw. Parameterless `int` declarations are unknown-signature placeholders, not verified ABI contracts. Names/NIDs match the 13.60 export table. The fourteen libtls lifecycle/config exports are implemented in `LibTls.cpp`; title compatibility beyond preconnection behavior remains unverified.
+- [Additional exports](../../../core/libs/prx/libSceLibreSsl3/AdditionalExports.cpp) declare 114 still-unimplemented callable exports: 105 named and 9 known only by NID. These entries throw. Parameterless `int` declarations are unknown-signature placeholders, not verified ABI contracts. Names/NIDs match the 13.60 export table. The fourteen libtls lifecycle/config exports are implemented in `LibTls.cpp`; title compatibility beyond preconnection behavior remains unverified.
 
 | Name | NID |
 | --- | --- |
@@ -97,6 +97,7 @@
 | `EC_POINT_set_affine_coordinates_GFp` | `8AGfaSvdDq4` |
 | `X509_STORE_CTX_get0_param` | `8wroYNJAQpo` |
 | `unknown` | `A-Hs-8mau+8` |
+| `ERR_load_X509_strings` | `A0lZtFjhcTw` |
 | `unknown` | `AiNud8LR8B4` |
 | `X509_cmp_current_time` | `Ax+Uu++rnrA` |
 | `SSL_CTX_set_timeout` | `BBOgwZLvXHA` |
@@ -117,6 +118,8 @@
 | `X509_print` | `LA1MlgDx80o` |
 | `HMAC_CTX_new` | `LcxutSyn11o` |
 | `X509_CRL_get0_by_cert` | `LdGe2IfIlpI` |
+| `ERR_load_PEM_strings` | `M7ze0mz2jQM` |
+| `OpenSSL_add_all_digests` | `O9Thca3enw8` |
 | `EVP_PKEY_base_id` | `OqtHJ7QUZg8` |
 | `unknown` | `PBYz0kpXwg8` |
 | `X509_new` | `PNfwr3s6dEs` |
