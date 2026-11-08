@@ -37,6 +37,7 @@ target_sources(libwebrtc PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/RtpExtension.cp
 target_sources(libwebrtc PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/NetworkManager.cpp)
 target_sources(libwebrtc PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/PlatformThread.cpp)
 target_sources(libwebrtc PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/I420Buffer.cpp)
+target_sources(libwebrtc PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/WavReader.cpp)
 target_sources(libwebrtc PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/KeyParams.cpp)
 target_sources(libwebrtc PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/Opus.cpp)
 target_sources(libwebrtc PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/RecursiveCriticalSection.cpp)
