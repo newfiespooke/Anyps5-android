@@ -86,6 +86,7 @@ add_library(libkernel SHARED EXCLUDE_FROM_ALL
         ${CMAKE_CURRENT_SOURCE_DIR}/System/src/SigvecRegistration.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/System/src/SignalSets.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/System/src/Notification.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/System/src/HostNotify.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/System/src/UserContext.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Time/Ktimer.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Time/SleepWake.cpp
@@ -105,7 +106,7 @@ endif()
 target_include_directories(libkernel PRIVATE ${LIBS_INCLUDE_DIR})
 target_include_directories(libkernel PRIVATE ${LIBS_INCLUDE_DIR}/nid/include)
 target_link_libraries(libkernel PRIVATE ${CMAKE_DL_LIBS})
-target_link_libraries(libkernel PRIVATE libc)
+target_link_libraries(libkernel PRIVATE libc anyps5_host_notify)
 if(WIN32)
     target_sources(libkernel PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/File/src/TrustedRoots.cpp)
     target_link_libraries(libkernel PRIVATE ws2_32 shell32 advapi32 crypt32 wbemuuid ole32 oleaut32)
@@ -113,6 +114,12 @@ if(WIN32)
     target_compile_definitions(libkernel PRIVATE _WIN32_WINNT=0x0602)
 endif()
 configure_windows_unwind(libkernel)
+
+find_package(Threads REQUIRED)
+add_library(anyps5_host_notify STATIC EXCLUDE_FROM_ALL ${CMAKE_CURRENT_SOURCE_DIR}/System/src/HostNotify.cpp)
+target_include_directories(anyps5_host_notify PRIVATE ${LIBS_INCLUDE_DIR})
+target_link_libraries(anyps5_host_notify PRIVATE Threads::Threads)
+set_target_properties(anyps5_host_notify PROPERTIES POSITION_INDEPENDENT_CODE ON CXX_VISIBILITY_PRESET hidden)
 
 if(BUILD_TESTING)
     set_property(SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/Semaphore/src/Ksem.cpp
@@ -212,6 +219,12 @@ if(BUILD_TESTING)
                 "PATH=path_list_prepend:$<TARGET_FILE_DIR:libkernel>")
         endif()
     endforeach()
+    add_test_executable(host_notify_tests ${LIBS_INCLUDE_DIR}/tests/HostNotify.cpp)
+    target_include_directories(host_notify_tests PRIVATE ${LIBS_INCLUDE_DIR})
+    target_link_libraries(host_notify_tests PRIVATE anyps5_host_notify Threads::Threads)
+    configure_host_test_executable(host_notify_tests)
+    add_test(NAME host_notify COMMAND host_notify_tests)
+
     add_test_executable(param_json_parser_tests ${LIBS_INCLUDE_DIR}/tests/ParamJsonParser.cpp)
     target_include_directories(param_json_parser_tests PRIVATE ${LIBS_INCLUDE_DIR})
     target_link_libraries(param_json_parser_tests PRIVATE libkernel libc)
