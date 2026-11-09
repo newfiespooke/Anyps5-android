@@ -371,7 +371,7 @@ void PadInput::applyMappingSnapshot() {
 void PadInput::reloadInputMapping() {
     if (!publishInputMapping(mappings, appTitleId())) return;
     applyMappingSnapshot();
-    APS5_LOG_OUT("Pad: input mapping reloaded");
+    APS5_LOG_CHARS_OUT("Pad: input mapping reloaded");
 }
 
 void PadInput::startInputMappingWatch() {
