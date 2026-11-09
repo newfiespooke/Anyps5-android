@@ -145,7 +145,7 @@ void APS5_VABI ASN1_TYPE_free_nid_postfix(Asn1Type* value);
 LibreSsl3EcdsaSig* APS5_VABI ECDSA_SIG_new_nid_postfix(void);
 int APS5_VABI ECDSA_SIG_set0_nid_postfix(LibreSsl3EcdsaSig* signature, Bignum* r, Bignum* s);
 void APS5_VABI ECDSA_SIG_free_nid_postfix(LibreSsl3EcdsaSig* signature);
-int APS5_VABI BIO_vfree_nid_postfix(void);
+void APS5_VABI BIO_vfree_nid_postfix(LibreSsl::Bio* bio);
 int APS5_VABI CRYPTO_memcmp_nid_postfix(const void* first, const void* second, std::size_t length);
 void APS5_VABI DH_get0_key_nid_postfix(const LibreSsl3Dh* dh, const void** pubKey, const void** privKey);
 void APS5_VABI DH_get0_pqg_nid_postfix(const LibreSsl3Dh* dh, const void** p, const void** q, const void** g);
