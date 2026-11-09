@@ -247,4 +247,10 @@ std::uint32_t APS5_VABI WKWebsiteDataStoreGetTypeID();
 std::uint32_t APS5_VABI WKWebsitePoliciesGetTypeID();
 std::uint32_t APS5_VABI WKWindowFeaturesGetTypeID();
 
+enum WKInputLanguage : int;
+enum WKImeEventType : int;
+struct WKImeEvent;
+WKInputLanguage APS5_VABI WKImeEventGetInputLanguage(const char* languageCode);
+WKImeEvent* APS5_VABI WKImeEventMake(WKImeEventType imeEventType, const char* compositionString, int keyCode);
+void APS5_VABI WKImeEventRelease(WKImeEvent* imeEvent);
 }

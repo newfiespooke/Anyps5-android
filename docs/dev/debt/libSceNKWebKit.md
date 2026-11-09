@@ -24,6 +24,7 @@ Inventory prose retains historical counts; use the [generated progress report](h
 - [WTF::Logger exports](../../../core/libs/prx/libSceNKWebKit/src/WtfLogger.cpp) have no console ABI or behavior verification. They follow the [PS5 11.x WebKit source](https://github.com/neonmodder123/PS5-WebKit-11.x/blob/80f77e94c63ee7202eec3d4b5b1a021dd89011ba/Source/WTF/wtf/Logger.cpp). A null `self`, a null method name or an oversized string throws instead of reproducing the upstream crash. Closes when: compared with a console module.
 
 ### Functional
+- [WKImeEvent helpers](../../../core/libs/prx/libSceNKWebKit/src/ImeEvent.cpp) (libSceNKWebKit) - IME event objects and language code resolution follow the PlayStation WebKit specification.
 - [WTF ICU version queries](../../../core/libs/prx/libSceNKWebKit/src/WtfPrimitives.cpp) (libSceNKWebKit) - `WTF::ICU::majorVersion` and `WTF::ICU::minorVersion` follow [ICUHelpers.cpp](https://github.com/neonmodder123/PS5-WebKit-11.x/blob/80f77e94c63ee7202eec3d4b5b1a021dd89011ba/Source/WTF/wtf/unicode/icu/ICUHelpers.cpp) at commit `80f77e94c63ee7202eec3d4b5b1a021dd89011ba`. Both functions query the underlying ICU version via `u_getVersion_nid_postfix` with `std::call_once` synchronization and return version components `[0]` and `[1]`. Runtime version values reflect `libSceIcu`'s reported ICU 78.1 release and have not been measured against console hardware traces.
 
 - [WKURL URL component and comparison helpers](../../../core/libs/prx/libSceNKWebKit/src/URL.cpp) (libSceNKWebKit) - `WKURLCopyHostName`, `WKURLCopyPath`, `WKURLCopyScheme`, `WKURLCopyLastPathComponent`, `WKURLCreateWithBaseURL` and `WKURLIsEqual` create and inspect `WKURLRef` host objects, resolving relative URLs against base URLs and comparing canonical URL strings; console execution is unverified.
@@ -433,9 +434,6 @@ Inventory prose retains historical counts; use the [generated progress report](h
 | `WKImageCreateCairoSurface` | `1QfyjHj40es` |
 | `WKImageCreateFromCairoSurface` | `jJePHioTWw0` |
 | `WKImageGetSize` | `NfSMc-E4OA0` |
-| `WKImeEventGetInputLanguage` | `YZP9-KrWVgc` |
-| `WKImeEventMake` | `E5qbM3aFc2s` |
-| `WKImeEventRelease` | `7Oc5AygU+9Q` |
 | `WKInspectorAttach` | `MPUvOTneByk` |
 | `WKInspectorClose` | `BjYGyklZu78` |
 | `WKInspectorConnect` | `il8-JtRpqUk` |
