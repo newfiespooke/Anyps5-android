@@ -677,6 +677,7 @@ int main() try {
     parserPartialText();
     reloadInputMappingAction();
     reloadErrorNamesLine();
+    padChordParse();
     std::filesystem::remove_all(root);
     std::cout << "input mapping tests passed\n";
     return 0;
