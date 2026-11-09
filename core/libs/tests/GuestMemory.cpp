@@ -211,9 +211,40 @@ static void CheckVirtualRangeNames() {
     Require(sceKernelSetVirtualRangeName(mapping, length, "first") == 0);
     Require(sceKernelSetVirtualRangeName(mapping, length, "second") == 0);
     Require(std::strcmp(NameAt(mapping), "second") == 0);
+    const char* const longest = "0123456789012345678901234567890";
+    Require(sceKernelSetVirtualRangeName(mapping, length, longest) == 0);
+    Require(std::strcmp(NameAt(mapping), longest) == 0);
+    Require(sceKernelSetVirtualRangeName(mapping, length, "01234567890123456789012345678901") == static_cast<int>(0x8002003fu));
+    Require(std::strcmp(NameAt(mapping), longest) == 0);
+    Require(sceKernelSetVirtualRangeName(mapping, 0, "zero") == 0);
+    Require(std::strcmp(NameAt(mapping), longest) == 0);
     Require(sceKernelClearVirtualRangeName(mapping, length) == 0);
     Require(NameAt(mapping)[0] == '\0');
     Require(sceKernelMunmap(reinterpret_cast<std::uint64_t>(mapping), length) == 0);
+}
+
+static void CheckMapNamedDirectMemoryNames() {
+    constexpr std::size_t length = 0x10000;
+    std::int64_t physical = 0;
+    Require(sceKernelAllocateDirectMemory(0, 0x7fffffffffll, length * 4, 0x10000, 0, &physical) == 0);
+    const char* const longest = "0123456789012345678901234567890";
+    const struct { const char* name; int result; const char* mapped; } cases[] = {
+        {longest, 0, longest},
+        {"01234567890123456789012345678901", static_cast<int>(0x8002003fu), ""},
+        {"", static_cast<int>(0x8002000eu), ""},
+    };
+    void* mappings[std::size(cases)] = {};
+    std::int64_t offset = 0;
+    std::size_t index = 0;
+    for (const auto& item : cases) {
+        void*& mapping = mappings[index++];
+        Require(sceKernelMapNamedDirectMemory(&mapping, length, 3, 0, physical + offset, 0x10000, item.name) == item.result);
+        Require(mapping != nullptr);
+        Require(std::strcmp(NameAt(mapping), item.mapped) == 0);
+        offset += length;
+    }
+    for (void* mapping : mappings) Require(sceKernelMunmap(reinterpret_cast<std::uint64_t>(mapping), length) == 0);
+    Require(sceKernelReleaseDirectMemory(physical, length * 4) == 0);
 }
 
 static void CheckAudioCoprocessorProtection() {
@@ -4289,6 +4320,7 @@ int main(int argc, char** argv) {
     CheckVirtualQueryWireLayout();
     CheckNamedAndHintedMappings();
     CheckVirtualRangeNames();
+    CheckMapNamedDirectMemoryNames();
     CheckInternalNamedFlexibleMapping();
     CheckFlexibleFixedReplacement();
     CheckMunmapScopedFlexibleRelease();
