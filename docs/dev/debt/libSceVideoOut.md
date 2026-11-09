@@ -298,3 +298,7 @@
 | `Unknown` | `IkyDS23qu4g` |
 | `Unknown` | `gQwfLPPIZQ8` |
 | `Unknown` | `rJmjlPlreu4` |
+
+### Mouse touchpad gaps
+
+- [KeyboardMouse](../../../core/libs/prx/libSceVideoOut/src/KeyboardMouse.cpp) - `ANYPS5_MOUSE_TOUCHPAD=1` gives the pad one touch point from the left mouse button. It is not multitouch, has no inertia after release, and does not follow the cursor outside the window. A real touchpad's finger timing and pressure are not modelled.
