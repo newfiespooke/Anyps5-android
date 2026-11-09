@@ -2,6 +2,7 @@
 
 - [OBJ_cmp](../../../core/libs/prx/libSceLibreSsl3/src/ObjCmp.cpp) (libSceLibreSsl3) - PS5 behavior and the library's LibreSSL version are not verified. The 40-byte LP64 `ASN1_OBJECT` layout and the comparison (length difference first, then the first differing byte as a difference of unsigned values) follow the public [LibreSSL source](https://github.com/libressl/openbsd/blob/bc9483725c5815efb64b6d9acc52fc5fba139212/src/lib/libcrypto/objects/obj_lib.c); the magnitude of a byte mismatch is the byte difference rather than whatever the console's `memcmp` returns. Null objects, null data with a nonzero length and negative lengths throw. LibreSSL subtracts unequal lengths before reading data, so unequal negative lengths do not necessarily fault; only equal negative lengths reach its byte comparison.
 - [`X509_PUBKEY_get0_param`](../../../core/libs/prx/libSceLibreSsl3/src/X509PubkeyParam.cpp) follows LibreSSL 4.0.0 `crypto/asn1/x_pubkey.c` at [`ce488b78e0bd994780569df718596b9776ff681a`](https://github.com/libressl/openbsd/blob/ce488b78e0bd994780569df718596b9776ff681a/src/lib/libcrypto/asn1/x_pubkey.c) and its `x509_local.h`, `x509.h` and `asn1.h` layouts. The function returns borrowed pointers and writes the encoded key length only when the key output is requested. The PS5 layout and malformed-object behavior are not verified on hardware; layout assertions match the pinned x86-64 source declarations.
+- [`X509_set_version`](../../../core/libs/prx/libSceLibreSsl3/src/X509.cpp) follows LibreSSL 4.0.0 `crypto/x509/x509_set.c` at [`ce488b78e0bd994780569df718596b9776ff681a`](https://github.com/libressl/openbsd/blob/ce488b78e0bd994780569df718596b9776ff681a/src/lib/libcrypto/x509/x509_set.c) and the `X509_CINF` layout in its `x509_local.h`. Versions outside 0 to 2 return 0 without mutation; a missing version integer is allocated from the guest heap, the encoding is marked modified, and the value is set through `ASN1_INTEGER_set`. A null certificate returns 0 and null certificate info, undefined upstream, throws. The 104-byte `X509_CINF` layout and the `enc.modified` offset 96 are not measured on the console.
 ### Functional
 
 - [libtls context and configuration lifecycle](../../../core/libs/prx/libSceLibreSsl3/src/LibTls.cpp) - Ten exports implement only preconnection lifecycle and configuration. TLS handshake, read/write, certificate validation and encrypted transport still throw; callers cannot establish TLS sessions. No PS5 native ABI or error strings have been measured. Signatures and config ownership follow the [LibreSSL libtls API](https://man.openbsd.org/tls_init.3) and [source](https://github.com/libressl/openbsd/tree/master/src/lib/libtls): independent config allocation, refcounts held by client/server contexts, copied key memory zeroized on replacement/free, error pointers and fresh-context close/configure behavior. A server without a certificate fails. Future transport must consume the retained config and implement certificate/SSL context state.
@@ -73,7 +74,7 @@
 
 ### Additional callable export inventory
 
-- [Additional exports](../../../core/libs/prx/libSceLibreSsl3/AdditionalExports.cpp) declare 117 still-unimplemented callable exports: 108 named and 9 known only by NID. These entries throw. Parameterless `int` declarations are unknown-signature placeholders, not verified ABI contracts. Names/NIDs match the 13.60 export table. The fourteen libtls lifecycle/config exports are implemented in `LibTls.cpp`; title compatibility beyond preconnection behavior remains unverified.
+- [Additional exports](../../../core/libs/prx/libSceLibreSsl3/AdditionalExports.cpp) declare 116 still-unimplemented callable exports: 107 named and 9 known only by NID. These entries throw. Parameterless `int` declarations are unknown-signature placeholders, not verified ABI contracts. Names/NIDs match the 13.60 export table. The fourteen libtls lifecycle/config exports are implemented in `LibTls.cpp`; title compatibility beyond preconnection behavior remains unverified.
 
 | Name | NID |
 | --- | --- |
@@ -111,7 +112,6 @@
 | `ERR_lib_error_string` | `F7jknWesBTY` |
 | `unknown` | `GjO5Ap3E-t4` |
 | `EVP_PKEY_verify` | `HEuvmk+aHs4` |
-| `X509_set_version` | `IOutZPRNNPo` |
 | `d2i_SSL_SESSION` | `IiG4HLr+cOw` |
 | `DES_set_key_unchecked` | `J437jVn9pjI` |
 | `EVP_PKEY_CTX_new_id` | `J5ZLHxWkT6k` |
