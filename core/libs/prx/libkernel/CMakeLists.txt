@@ -56,6 +56,9 @@ add_library(libkernel SHARED EXCLUDE_FROM_ALL
         ${CMAKE_CURRENT_SOURCE_DIR}/Socket/src/SocketOptions.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Socket/src/AddressConversion.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Socket/src/SocketConnect.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Socket/src/LanRelay.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Socket/src/LanRelayStartup.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Socket/src/LanRelayForward.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/EventFlag/src/EventFlag.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Module/src/Module.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Module/src/DynamicLoader.cpp
@@ -1933,6 +1936,46 @@ if(BUILD_TESTING)
     configure_windows_unwind(guest_socket_stream_options_tests)
     add_test(NAME guest_socket_stream_options COMMAND guest_socket_stream_options_tests)
     set_tests_properties(guest_socket_stream_options PROPERTIES TIMEOUT 20)
+    add_test_executable(lan_relay_tests ${LIBS_INCLUDE_DIR}/tests/LanRelayHost.cpp ${CMAKE_CURRENT_SOURCE_DIR}/Socket/src/LanRelay.cpp)
+    target_include_directories(lan_relay_tests PRIVATE ${LIBS_INCLUDE_DIR})
+    configure_host_test_executable(lan_relay_tests)
+    if(WIN32)
+        target_link_libraries(lan_relay_tests PRIVATE ws2_32)
+    endif()
+    add_test(NAME lan_relay COMMAND lan_relay_tests)
+    add_test_executable(guest_udp_broadcast_relay_tests ${LIBS_INCLUDE_DIR}/tests/GuestUdpBroadcastRelay.cpp)
+    target_include_directories(guest_udp_broadcast_relay_tests PRIVATE ${LIBS_INCLUDE_DIR})
+    target_link_libraries(guest_udp_broadcast_relay_tests PRIVATE libkernel libc)
+    configure_windows_unwind(guest_udp_broadcast_relay_tests)
+    add_test(NAME guest_udp_broadcast_relay COMMAND guest_udp_broadcast_relay_tests)
+    set_tests_properties(guest_udp_broadcast_relay PROPERTIES TIMEOUT 20
+        ENVIRONMENT "ANYPS5_LAN_LISTEN=127.0.0.1:47391;ANYPS5_LAN_PEERS=127.0.0.1:47392")
+    if(WIN32)
+        set_tests_properties(guest_udp_broadcast_relay PROPERTIES ENVIRONMENT_MODIFICATION
+            "PATH=path_list_prepend:$<TARGET_FILE_DIR:libkernel>")
+    endif()
+    add_test_executable(guest_lan_relay_delivery_tests ${LIBS_INCLUDE_DIR}/tests/GuestLanRelayDelivery.cpp)
+    target_include_directories(guest_lan_relay_delivery_tests PRIVATE ${LIBS_INCLUDE_DIR})
+    target_link_libraries(guest_lan_relay_delivery_tests PRIVATE libkernel libc)
+    configure_windows_unwind(guest_lan_relay_delivery_tests)
+    add_test(NAME guest_lan_relay_delivery COMMAND guest_lan_relay_delivery_tests)
+    set_tests_properties(guest_lan_relay_delivery PROPERTIES TIMEOUT 20
+        ENVIRONMENT "ANYPS5_LAN_LISTEN=127.0.0.1:47411;ANYPS5_LAN_PEERS=127.0.0.1:47412")
+    if(WIN32)
+        set_tests_properties(guest_lan_relay_delivery PROPERTIES ENVIRONMENT_MODIFICATION
+            "PATH=path_list_prepend:$<TARGET_FILE_DIR:libkernel>")
+    endif()
+    add_test_executable(guest_lan_relay_multicast_tests ${LIBS_INCLUDE_DIR}/tests/GuestLanRelayMulticast.cpp)
+    target_include_directories(guest_lan_relay_multicast_tests PRIVATE ${LIBS_INCLUDE_DIR})
+    target_link_libraries(guest_lan_relay_multicast_tests PRIVATE libkernel libc)
+    configure_windows_unwind(guest_lan_relay_multicast_tests)
+    add_test(NAME guest_lan_relay_multicast COMMAND guest_lan_relay_multicast_tests)
+    set_tests_properties(guest_lan_relay_multicast PROPERTIES TIMEOUT 20
+        ENVIRONMENT "ANYPS5_LAN_LISTEN=127.0.0.1:47421;ANYPS5_LAN_PEERS=127.0.0.1:47422")
+    if(WIN32)
+        set_tests_properties(guest_lan_relay_multicast PROPERTIES ENVIRONMENT_MODIFICATION
+            "PATH=path_list_prepend:$<TARGET_FILE_DIR:libkernel>")
+    endif()
     if(WIN32)
         set_tests_properties(guest_socket_stream_options PROPERTIES ENVIRONMENT_MODIFICATION
             "PATH=path_list_prepend:$<TARGET_FILE_DIR:libkernel>")
