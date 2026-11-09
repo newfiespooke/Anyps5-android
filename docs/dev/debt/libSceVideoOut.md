@@ -298,3 +298,8 @@
 | `Unknown` | `IkyDS23qu4g` |
 | `Unknown` | `gQwfLPPIZQ8` |
 | `Unknown` | `rJmjlPlreu4` |
+
+### Host input mapping gaps
+
+- [PadInput](../../../core/libs/prx/libSceVideoOut/src/PadInput.cpp) - a `PAD:` chord fires its emulator action and its buttons still reach the title's pad state. Masking the chord buttons while the chord is held is not done, so a chord that uses a button the title needs also reaches the title.
+- [PadInput](../../../core/libs/prx/libSceVideoOut/src/PadInput.cpp) - `PAD:` chords are evaluated on controller button events only and are not dispatched while the IME or a modal dialog captures input.
