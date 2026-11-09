@@ -23,6 +23,7 @@ target_sources(libSceLibreSsl3 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/LibTls.cp
 target_sources(libSceLibreSsl3 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/Time.cpp)
 target_sources(libSceLibreSsl3 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/DigestNames.cpp)
 target_sources(libSceLibreSsl3 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/EcdsaSig.cpp)
+target_sources(libSceLibreSsl3 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/EcGroup.cpp)
 
 target_sources(libSceLibreSsl3 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/Asn1Values.cpp)
 
@@ -469,4 +470,17 @@ if(BUILD_TESTING AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
     target_link_libraries(guest_libressl3_pkey_lifecycle_tests PRIVATE ${CMAKE_DL_LIBS})
     add_test(NAME guest_libressl3_pkey_lifecycle COMMAND guest_libressl3_pkey_lifecycle_tests ${pkeyLifecycleDirectory})
     set_tests_properties(guest_libressl3_pkey_lifecycle PROPERTIES TIMEOUT 20)
+endif()
+
+if(BUILD_TESTING)
+    add_test_executable(guest_libressl3_ec_group_tests ${CMAKE_CURRENT_SOURCE_DIR}/tests/EcGroup.cpp)
+    target_include_directories(guest_libressl3_ec_group_tests PRIVATE ${LIBS_INCLUDE_DIR})
+    target_link_libraries(guest_libressl3_ec_group_tests PRIVATE libSceLibreSsl3 libSceLibreSsl libc)
+    configure_windows_unwind(guest_libressl3_ec_group_tests)
+    add_test(NAME guest_libressl3_ec_group COMMAND guest_libressl3_ec_group_tests)
+    set_tests_properties(guest_libressl3_ec_group PROPERTIES TIMEOUT 20)
+    if(WIN32)
+        set_tests_properties(guest_libressl3_ec_group PROPERTIES ENVIRONMENT_MODIFICATION
+            "PATH=path_list_prepend:$<TARGET_FILE_DIR:libSceLibreSsl3>")
+    endif()
 endif()
