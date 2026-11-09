@@ -4,6 +4,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <string_view>
 #include <filesystem>
 #include <span>
 #include <stdexcept>
@@ -475,6 +476,12 @@ void PadInput::HandleEvent(const SDL_Event& event, DisplayWindow& window) {
     if (event.type == SDL_KEYDOWN && ImeCapturesKeyboard_nid_postfix()) return;
     if (event.type != SDL_KEYUP && event.type != SDL_MOUSEBUTTONUP && ModalDialogCapturesInput_nid_postfix()) return;
     keyboardMouse.SetTitleReadsMouse(MouseIsOpen_nid_no_patch());
+    static const bool mouseTouchpad = std::getenv("ANYPS5_MOUSE_TOUCHPAD") != nullptr && std::string_view(std::getenv("ANYPS5_MOUSE_TOUCHPAD")) == "1";
+    keyboardMouse.SetMouseTouchpad(mouseTouchpad);
+    int viewportWidth = 0;
+    int viewportHeight = 0;
+    if (window.Handle() != nullptr) SDL_GetWindowSize(window.Handle(), &viewportWidth, &viewportHeight);
+    keyboardMouse.SetViewport(viewportWidth, viewportHeight);
     const auto requests = keyboardMouse.HandleEvent(event, std::chrono::steady_clock::now());
     if (requests.toggleFullscreen && window.Handle() != nullptr && event.key.windowID == SDL_GetWindowID(window.Handle())) window.ToggleFullscreen();
     if (requests.togglePerformanceOverlay && window.Handle() != nullptr && event.key.windowID == SDL_GetWindowID(window.Handle())) AgcDriverTogglePerformanceOverlay_nid_postfix();

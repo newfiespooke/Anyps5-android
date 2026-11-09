@@ -4,6 +4,7 @@
 #include <array>
 #include <chrono>
 #include <cstdint>
+#include <optional>
 #include <vector>
 #include "SDL_events.h"
 
@@ -71,6 +72,8 @@ public:
     InputRequests HandleEvent(const SDL_Event& event, Clock::time_point now);
     bool Advance(Clock::time_point now);
     void SetMouseMode(bool enabled);
+    void SetMouseTouchpad(bool enabled);
+    void SetViewport(int width, int height);
     void SetTitleReadsMouse(bool reads);
     void Release();
     bool MouseMode() const;
@@ -99,6 +102,11 @@ private:
     bool axesAdvanced = false;
     bool mouseMode = false;
     bool titleReadsMouse = false;
+    bool mouseTouchpad = false;
+    int viewportWidth = 0;
+    int viewportHeight = 0;
+    std::optional<PadTouchPoint> mouseTouch;
+    std::optional<PadTouchPoint> touchAt(int x, int y) const;
 };
 
 std::uint8_t StickByte(double deflection);
