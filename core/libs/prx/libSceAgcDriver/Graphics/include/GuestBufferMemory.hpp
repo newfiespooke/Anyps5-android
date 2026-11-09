@@ -294,6 +294,12 @@ void ClearSnapshotCopies(VkDevice device);
 std::vector<std::uint64_t> AddressTableKey(std::span<const std::pair<std::uint64_t, std::uint64_t>> writes, std::span<const ShaderRecompiler::BdaAbi::Range> own);
 void ClearImageMirrors(VkDevice device);
 void ClearHostImports(VkDevice device);
+void ClearResidentRanges(VkDevice device);
+struct ResidentStatistics {
+    std::size_t resident = 0;
+    std::uint64_t promoted = 0, bound = 0, skipped = 0, copied = 0, invalidated = 0;
+};
+ResidentStatistics ResidentCounts();
 
 struct RetainedAddressSpace {
     std::shared_ptr<const void> space;
@@ -525,6 +531,7 @@ private:
         // The device refused the shadow (memory or allocations exhausted): the region takes the
         // path it would take without staging, in both upload stages.
         bool unstaged = false;
+        bool resident = false;
         bool overlay = false;
         bool adaptiveInPlace = false;
     };
